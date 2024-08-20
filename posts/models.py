@@ -1,18 +1,14 @@
 from django.db import models
-
+from django.utils.translation import gettext_lazy
 
 
 
 
 class Posts(models.Model):
 
-    PRIVATE = 'private'
-    PUBLIC = 'public'
-
-    CHAT_TYPE = (
-        (PRIVATE, 'private'),
-        (PUBLIC, 'public'),
-    )
+    class ChatType(models.TextChoices):
+        PRIVATE = 'private'
+        PUBLIC = 'public'
 
     created_date = models.DateTimeField(
         auto_now_add = True,
@@ -26,10 +22,22 @@ class Posts(models.Model):
 
     chat = models.CharField(
         max_length=55,
-        default=PRIVATE,
-        choices=CHAT_TYPE,
+        default=ChatType.PRIVATE,
+        choices=ChatType.choices,
         verbose_name='Тип чата',
     )
+
+    text = models.TextField(
+        verbose_name='Текст поста',
+        blank=True,
+    )
+
+
+
+
+
+
+
 
     def __str__(self):
         return f'{self.id} - эл Posts'
