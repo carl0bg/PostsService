@@ -1,0 +1,20 @@
+
+
+version: '3.9'
+
+services:
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9090"
+    # env_file:
+    #   - .env
+    environment:
+      - MINIO_ROOT_USER=dima
+      - MINIO_ROOT_PASSWORD=200320032003
+      - MINIO_URL=http://jminio:9000
+    # hostname: minio.local
+    ports:
+      - 9000:9000
+      - 9090:9090
