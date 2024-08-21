@@ -32,8 +32,23 @@ class Posts(models.Model):
         blank=True,
     )
 
-    document = models.FileField(storage=S3Boto3Storage())
+    document = models.FileField(
+        storage=S3Boto3Storage(),
+        null=True,
+        blank = True,
+    )
+    video = models.FileField(
+        storage=S3Boto3Storage(),
+        null=True,
+        blank = True,
+    )
 
+
+    photo = models.ImageField(
+        storage=S3Boto3Storage(),
+        null=True,
+        blank = True,
+    )
 
 
 

@@ -142,7 +142,7 @@ AWS_ACCESS_KEY_ID = config.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = config.aws_secret_access_key
 # AWS_S3_ENDPOINT_URL = 'http://minio:9000'
 AWS_S3_ENDPOINT_URL = config.aws_s3_endpoint_url
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}'
+# AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}'
    
 AWS_S3_FILE_OVERWRITE = False  # Не перезаписывать файлы с одинаковыми именами
 
