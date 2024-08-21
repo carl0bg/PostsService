@@ -136,8 +136,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #настройки storage minio
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = "django_minio_backend.models.MinioBackend"
 
 AWS_STORAGE_BUCKET_NAME = config.aws_storage_bucket_name
+
+# Настройка бакета для документов
+
+# AWS_STORAGE_BUCKET_NAME_DOCUMENTS = 'documentdjango'
+# Настройка бакета для фотографий
+# AWS_STORAGE_BUCKET_NAME_PHOTOS = 'photodjango'
+
+# Настройка бакета для видео
+# AWS_STORAGE_BUCKET_NAME_VIDEOS = 'videodjango'
+
+
+
+
 AWS_ACCESS_KEY_ID = config.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = config.aws_secret_access_key
 # AWS_S3_ENDPOINT_URL = 'http://minio:9000'

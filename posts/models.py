@@ -33,19 +33,19 @@ class Posts(models.Model):
     )
 
     document = models.FileField(
-        storage=S3Boto3Storage(),
+        storage=S3Boto3Storage(location = 'documentdjango'),
         null=True,
         blank = True,
     )
     video = models.FileField(
-        storage=S3Boto3Storage(),
+        storage=S3Boto3Storage(location = 'videodjango'),
         null=True,
         blank = True,
     )
 
 
     photo = models.ImageField(
-        storage=S3Boto3Storage(),
+        storage=S3Boto3Storage(location = 'photodjango1'),
         null=True,
         blank = True,
     )
