@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy
 from storages.backends.s3boto3 import S3Boto3Storage
 
+from config.db_const import config
 
 
 class Posts(models.Model):
@@ -29,11 +30,27 @@ class Posts(models.Model):
 
     text = models.TextField(
         verbose_name='Текст поста',
+        null = True,
         blank=True,
     )
 
-    document = models.FileField(storage=S3Boto3Storage())
+    document = models.FileField(
+        storage=S3Boto3Storage(),
+        null=True,
+        blank = True,
+    )
 
+    photo = models.ImageField(
+        storage=S3Boto3Storage(),
+        null=True,
+        blank = True,
+    )
+    
+    video = models.FileField(
+        storage=S3Boto3Storage(),
+        null=True,
+        blank = True,
+    )
 
 
 
