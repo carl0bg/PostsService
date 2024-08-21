@@ -32,6 +32,10 @@ class Posts(models.Model):
         blank=True,
     )
 
+    document = models.FileField(
+        null = True,
+        upload_to='local_storage/'
+    )
 
 
 
