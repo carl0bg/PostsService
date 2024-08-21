@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
-
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 
@@ -32,10 +32,7 @@ class Posts(models.Model):
         blank=True,
     )
 
-    document = models.FileField(
-        null = True,
-        upload_to='local_storage/'
-    )
+    document = models.FileField(storage=S3Boto3Storage())
 
 
 
