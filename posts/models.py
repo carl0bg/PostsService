@@ -2,6 +2,17 @@ from django.db import models
 from django.utils.translation import gettext_lazy
 from storages.backends.s3boto3 import S3Boto3Storage
 
+from PostsService.settings import DOCUMENT_BUCKET_NAME, PHOTO_BUCKET_NAME, VIDEO_BUCKET_NAME
+
+
+class DocumentStorage(S3Boto3Storage):
+    bucket_name = DOCUMENT_BUCKET_NAME 
+
+class VideoStorage(S3Boto3Storage):
+    bucket_name = VIDEO_BUCKET_NAME 
+
+class PhotoStorage(S3Boto3Storage):
+    bucket_name = PHOTO_BUCKET_NAME 
 
 
 class Posts(models.Model):
@@ -33,24 +44,22 @@ class Posts(models.Model):
     )
 
     document = models.FileField(
-        storage=S3Boto3Storage(location = 'document'),
+        storage=DocumentStorage(),
         null=True,
         blank = True,
     )
     video = models.FileField(
-        storage=S3Boto3Storage(location = 'video'),
+        storage=VideoStorage(),
         null=True,
         blank = True,
     )
 
 
     photo = models.ImageField(
-        storage=S3Boto3Storage(location = 'photo'),
+        storage=PhotoStorage(),
         null=True,
         blank = True,
     )
-
-
 
 
 
