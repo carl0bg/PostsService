@@ -8,8 +8,13 @@ certifi==2024.7.4
 cffi==1.17.0
 Django==5.1
 django-storages==1.14.4
+djangorestframework==3.15.2
+drf-yasg==1.21.7
+inflection==0.5.1
 jmespath==1.0.1
 minio==7.2.8
+packaging==24.1
+pillow==10.4.0
 psycopg2-binary==2.9.9
 pycparser==2.22
 pycryptodome==3.20.0
@@ -18,8 +23,11 @@ pydantic-settings==2.4.0
 pydantic_core==2.20.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+pytz==2024.1
+PyYAML==6.0.2
 s3transfer==0.10.2
 six==1.16.0
 sqlparse==0.5.1
 typing_extensions==4.12.2
+uritemplate==4.1.1
 urllib3==2.2.2
