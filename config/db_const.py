@@ -17,4 +17,4 @@ class Settings(BaseSettings):
 
 
 config = Settings()
-# print(config.aws_storage_bucket_name_video)
+print()
