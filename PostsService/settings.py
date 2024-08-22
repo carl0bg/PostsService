@@ -127,15 +127,26 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> minio_v1
 
 #настройки storage minio
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = "django_minio_backend.models.MinioBackend"
 
+
+<<<<<<< HEAD
 # AWS_STORAGE_BUCKET_NAME = config.aws_storage_bucket_name
+=======
+>>>>>>> minio_v1
 AWS_ACCESS_KEY_ID = config.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = config.aws_secret_access_key
 AWS_S3_ENDPOINT_URL = config.aws_s3_endpoint_url
+<<<<<<< HEAD
 # AWS_STORAGE_BUCKET_NAME_DOCUMENT = config.aws_storage_bucket_name_document
 AWS_STORAGE_BUCKET_NAME_VIDEO = config.aws_storage_bucket_name_video
 # AWS_STORAGE_BUCKET_NAME_PHOTO = config.aws_storage_bucket_name_photo
@@ -144,3 +155,19 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME_VIDEO}'
 AWS_S3_FILE_OVERWRITE = False  # Не перезаписывать файлы с одинаковыми именами
 
 
+=======
+
+
+
+DOCUMENT_BUCKET_NAME = config.aws_storage_bucket_name_document
+VIDEO_BUCKET_NAME = config.aws_storage_bucket_name_video
+PHOTO_BUCKET_NAME = config.aws_storage_bucket_name_photo
+
+# Определите URL для каждого бакета
+AWS_S3_DOCUMENT_URL = f'{AWS_S3_ENDPOINT_URL}/{DOCUMENT_BUCKET_NAME}/'
+AWS_S3_VIDEO_URL = f'{AWS_S3_ENDPOINT_URL}/{VIDEO_BUCKET_NAME}/'
+AWS_S3_PHOTO_URL = f'{AWS_S3_ENDPOINT_URL}/{PHOTO_BUCKET_NAME}/'
+   
+AWS_S3_FILE_OVERWRITE = False  # Не перезаписывать файлы с одинаковыми именами
+
+>>>>>>> minio_v1
