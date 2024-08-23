@@ -1,26 +1,13 @@
+import boto3
+
 from django.db import models
 from django.utils.translation import gettext_lazy
-from storages.backends.s3boto3 import S3Boto3Storage
-
-from PostsService.settings import DOCUMENT_BUCKET_NAME, PHOTO_BUCKET_NAME, VIDEO_BUCKET_NAME
-from storages.backends.s3boto3 import S3Boto3Storage
-import boto3
-from config.db_const import config
-
-
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
-
-class DocumentStorage(S3Boto3Storage):
-    bucket_name = DOCUMENT_BUCKET_NAME 
-
-class VideoStorage(S3Boto3Storage):
-    bucket_name = VIDEO_BUCKET_NAME 
-
-class PhotoStorage(S3Boto3Storage):
-    bucket_name = PHOTO_BUCKET_NAME 
-
+from config.db_const import config
+from .storage import PhotoStorage, DocumentStorage, VideoStorage
+from .storage import delete_type_from_s3
 
 
 class Photo(models.Model):
@@ -30,45 +17,18 @@ class Photo(models.Model):
         related_name='photos'
     )
     
-    image = models.ImageField(
+    file = models.ImageField(
         storage=PhotoStorage(),
         null=True,
         blank=True
     )
 
-
-    def delete_photo_from_s3(self):
-        s3_client = boto3.client(
-            's3',
-            aws_access_key_id=config.aws_access_key_id,
-            aws_secret_access_key=config.aws_secret_access_key,
-            endpoint_url=config.aws_s3_endpoint_url
-        )
-        bucket_name = PHOTO_BUCKET_NAME
-        key = self.image.name
-        print(key)
-        print(bucket_name)
-
-        try:
-            s3_client.delete_object(Bucket=bucket_name, Key=key)
-            print('Удалилили s3333')
-        except Exception as e:
-            print(e)
-
-
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
-        self.delete_photo_from_s3()
-
+        delete_type_from_s3(self)
 
     def __str__(self):
         return f'Photo for post {self.post.id}'
-
-
-
-@receiver(post_delete, sender=Photo)
-def delete_photo_from_s3(instance: Photo, **kwargs):
-    instance.delete_photo_from_s3()
 
 
 
@@ -79,14 +39,19 @@ class Video(models.Model):
         related_name='videos'
     )
     
-    video_file = models.FileField(
+    file = models.FileField(
         storage=VideoStorage(),
         null=True,
         blank=True
     )
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        delete_type_from_s3(self)
+
     def __str__(self):
         return f'Video for post {self.post.id}'
+
 
 
 class Document(models.Model):
@@ -102,6 +67,12 @@ class Document(models.Model):
         null=True,
         blank=True
     )
+
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        delete_type_from_s3(self)
+
 
     def __str__(self):
         return f'Document for post {self.post.id}'
@@ -138,3 +109,16 @@ class Posts(models.Model):
 
     def __str__(self):
         return f'Post {self.id}'
+
+
+@receiver(post_delete, sender=Photo)
+@receiver(post_delete, sender=Video)
+@receiver(post_delete, sender=Document)
+def delete_all_type_from_s3(instance, **kwargs):
+    if isinstance(instance, Photo):
+        bucket_name = PhotoStorage().bucket_name
+    elif isinstance(instance, Video):
+        bucket_name = VideoStorage().bucket_name
+    elif isinstance(instance, Document):
+        bucket_name = DocumentStorage().bucket_name
+    delete_type_from_s3(instance, bucket_name)

@@ -26,13 +26,13 @@ class PostsAdmin(ModelAdmin):
 
 @admin.register(Photo)
 class PostsAdmin(ModelAdmin):
-    list_display = ('post', 'image')
+    list_display = ('post', 'file')
 
 
 
 @admin.register(Video)
 class PostsAdmin(ModelAdmin):
-    list_display = ('post', 'video_file')
+    list_display = ('post', 'file')
 
 
 @admin.register(Document)
