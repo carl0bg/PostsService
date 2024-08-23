@@ -8,6 +8,10 @@ import boto3
 from config.db_const import config
 
 
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+
+
 class DocumentStorage(S3Boto3Storage):
     bucket_name = DOCUMENT_BUCKET_NAME 
 
@@ -47,6 +51,7 @@ class Photo(models.Model):
 
         try:
             s3_client.delete_object(Bucket=bucket_name, Key=key)
+            print('Удалилили s3333')
         except Exception as e:
             print(e)
 
@@ -58,6 +63,13 @@ class Photo(models.Model):
 
     def __str__(self):
         return f'Photo for post {self.post.id}'
+
+
+
+@receiver(post_delete, sender=Photo)
+def delete_photo_from_s3(instance: Photo, **kwargs):
+    instance.delete_photo_from_s3()
+
 
 
 class Video(models.Model):
