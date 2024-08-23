@@ -3,6 +3,9 @@ from django.utils.translation import gettext_lazy
 from storages.backends.s3boto3 import S3Boto3Storage
 
 from PostsService.settings import DOCUMENT_BUCKET_NAME, PHOTO_BUCKET_NAME, VIDEO_BUCKET_NAME
+from storages.backends.s3boto3 import S3Boto3Storage
+import boto3
+from config.db_const import config
 
 
 class DocumentStorage(S3Boto3Storage):
@@ -28,6 +31,30 @@ class Photo(models.Model):
         null=True,
         blank=True
     )
+
+
+    def delete_photo_from_s3(self):
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=config.aws_access_key_id,
+            aws_secret_access_key=config.aws_secret_access_key,
+            endpoint_url=config.aws_s3_endpoint_url
+        )
+        bucket_name = PHOTO_BUCKET_NAME
+        key = self.image.name
+        print(key)
+        print(bucket_name)
+
+        try:
+            s3_client.delete_object(Bucket=bucket_name, Key=key)
+        except Exception as e:
+            print(e)
+
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.delete_photo_from_s3()
+
 
     def __str__(self):
         return f'Photo for post {self.post.id}'
