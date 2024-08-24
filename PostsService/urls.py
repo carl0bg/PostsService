@@ -8,6 +8,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('posts_api/', include('posts.urls', namespace= 'posts_api')),
     path('photo_api/', include('photo.urls', namespace= 'photo_api')),
+    path('video_api/', include('video.urls', namespace= 'video_api')),
+    path('document_api/', include('document.urls', namespace= 'document_api')),
+
     
 ]
 

@@ -31,6 +31,5 @@ class Photo(models.Model):
 
 @receiver(post_delete, sender=Photo)
 def delete_all_type_from_s3(instance, **kwargs):
-    print('helllllllllllllllllllllllllllllllllllllllllllllllllllleeee')
     bucket_name = PhotoStorage().bucket_name
     delete_type_from_s3(instance, bucket_name)
