@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from .models import Posts, Photo, Video, Document
+from .models import Posts
+from photo.models import Photo
+from document.models import Document
+from video.models import Video
+
 
 
 @admin.register(Posts)

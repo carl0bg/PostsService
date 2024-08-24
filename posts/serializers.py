@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Posts, Photo, Document, Video
+from .models import Posts
 
 class PostSerializers(serializers.ModelSerializer):
     class Meta:
@@ -8,21 +8,5 @@ class PostSerializers(serializers.ModelSerializer):
         fields= '__all__'
 
 
-class PhotoSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Photo
-        fields= '__all__'
-
-        
-class DocumentSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Document
-        fields= '__all__'
-
-        
-class VideoSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields= '__all__'
 
         
