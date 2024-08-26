@@ -19,7 +19,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -27,14 +27,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'drf_yasg',
+    'rest_framework',
+    'django_filters',
+]
+
+
+PROJECT_APPS = [
     'posts',
     'photo',
     'video',
     'document',
-
-    'drf_yasg',
-    'rest_framework',
 ]
+
+INSTALLED_APPS = DJANGO_BASE_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -160,3 +166,39 @@ AWS_S3_PHOTO_URL = f'{AWS_S3_ENDPOINT_URL}/{PHOTO_BUCKET_NAME}/'
    
 AWS_S3_FILE_OVERWRITE = False  # Не перезаписывать файлы с одинаковыми именами
 
+
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer', #необходимо закоментировать на релиз, когда платформа drf не была видна, а только сырой json
+    ],
+
+    # # "DEFAULT_PERMISSION_CLASSES": [
+    # #     'rest_framework.permissions.AllowAny',
+    # # ],
+    # "DEFAULT_AUTHENTICATION_CLASSES": (
+    #     # 'rest_framework.authentication.TokenAuthentication',
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    #     # 'rest_framework.authentication.BasicAuthentication',
+
+    # ),
+
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
+
+
+    # "DEFAULT_SCHEMA_CLASS": 'rest_framework.schemas.coreapi.AutoSchema', #openapi #coreapi
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.IsAuthenticated',#это значит что доступ будет разрешен, только зарегистрированным пользователям
+        'rest_framework.permissions.AllowAny',
+    ],
+
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+
+}
