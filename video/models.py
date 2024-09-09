@@ -27,6 +27,9 @@ class Video(models.Model):
 
     def __str__(self):
         return f'Video for post {self.post.id}'
+    
+    class Meta:
+        db_table = 'video'
 
 
 @receiver(post_delete, sender=Video)

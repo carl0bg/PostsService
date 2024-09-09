@@ -26,6 +26,9 @@ class Photo(models.Model):
 
     def __str__(self):
         return f'Photo for post {self.post.id}'
+    
+    class Meta:
+        db_table = 'photo'
 
 
 

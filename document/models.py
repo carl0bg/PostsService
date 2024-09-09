@@ -31,6 +31,9 @@ class Document(models.Model):
 
     def __str__(self):
         return f'Document for post {self.post.id}'
+    
+    class Meta:
+        db_table = 'document'
 
 
 

@@ -31,6 +31,10 @@ class Posts(models.Model):
         blank=True
     )
 
+
+    class Meta:
+        db_table = 'posts'
+
     def __str__(self):
         return f'Post {self.id}'
 
