@@ -38,6 +38,7 @@ PROJECT_APPS = [
     'photo',
     'video',
     'document',
+    'TestUser',
 ]
 
 INSTALLED_APPS = DJANGO_BASE_APPS + PROJECT_APPS
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'PostsService.middleware.HeaderCheckMiddleware',
 ]
 
 ROOT_URLCONF = 'PostsService.urls'
@@ -202,3 +204,8 @@ REST_FRAMEWORK = {
     ],
 
 }
+
+
+
+#jwt
+JWS_SECRET_ACCESS_KEY = config.jws_secret_access_key
