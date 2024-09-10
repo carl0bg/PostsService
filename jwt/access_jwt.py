@@ -7,6 +7,7 @@ from config.db_const import config
 
 def create_access_token_jws(user_id = 1):
     secret_key = config.jws_secret_access_key  # Используйте ключ, который хранится в settings.py
+    secret_key  = 
     algorithm = 'HS256'
     
     # Определяем полезную нагрузку (payload)

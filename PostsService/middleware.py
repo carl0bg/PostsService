@@ -34,11 +34,15 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
             token = auth_header.split(' ')[1]
 
             # Проверяем и декодируем токен
-            payload = jwt.decode(token, '2003', algorithms=['HS256'])
+            payload = jwt.decode(token, 'dimas', algorithms=['HS256'])
 
             # Вы можете добавить объект пользователя в request, если это необходимо
             request.user_id = payload.get('user_id')  # Предполагается, что в токене есть поле user_id
             # Дополнительная логика для поиска пользователя в БД и добавления его в request
+            if request.user_id == '1':
+                print('Nicccccccccccceee')
+            else:
+                print("Nooooooooooooooo")
 
         except jwt.ExpiredSignatureError:
             return JsonResponse({'error': 'Token has expired'}, status=401)
