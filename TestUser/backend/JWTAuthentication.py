@@ -57,7 +57,7 @@ from django.core.exceptions import PermissionDenied
 
 
 
-class JWTAuthentication:
+class JWTAuthentication(authentication.BaseAuthentication):
     authentication_header_prefix = 'Bearer'
 
     def authenticate(self, request):

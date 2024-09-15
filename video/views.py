@@ -13,7 +13,7 @@ class VideoDetailView(generics.RetrieveDestroyAPIView):
     queryset = Video.objects.all()
     serializer_class = VideoSerializers
 
-    permission_classes = [IsAuthenticated,]
+    # permission_classes = [IsAuthenticated,]
 
 
 
