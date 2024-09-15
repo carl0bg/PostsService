@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     # 'django.contrib.auth.middleware.AuthenticationMiddleware',  #связывает пользователей с запросами с помощью сеансов. #TODO
-    'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'PostsService.middleware.HeaderCheckMiddleware',
 ]
@@ -86,8 +86,7 @@ WSGI_APPLICATION = 'PostsService.wsgi.application'
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
-# }
-
+# }3
 
 DATABASES = {
     'default': {
