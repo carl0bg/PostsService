@@ -6,6 +6,6 @@ app_name = 'auth'
 
 
 urlpatterns = [
-    path('users/register/', RegistrationAPIView.as_view()),
+    path('user/register/', RegistrationAPIView.as_view()),
     path('user/login/', LoginAPIView.as_view()),
 ]
