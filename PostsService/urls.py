@@ -5,7 +5,7 @@ from .yasg import urlpatterns as swagger_url
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
 
     path('posts_api/', include('posts.urls', namespace= 'posts_api')),
     path('photo_api/', include('photo.urls', namespace= 'photo_api')),

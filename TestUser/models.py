@@ -81,7 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
 
     def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(days=1)
+        dt = datetime.now() + timedelta(minutes=1)
 
         token = jwt.encode(
             {

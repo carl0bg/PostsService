@@ -4,18 +4,20 @@ from django.http import JsonResponse
 
 import jwt
 
-class HeaderCheckMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
+from config.db_const import config
 
-    def __call__(self, request):
-        # Проверяем наличие нужного заголовка
-        if '2003' not in request.headers:
-            return HttpResponseForbidden("Access denied: Missing header")
+# class HeaderCheckMiddleware:
+#     def __init__(self, get_response):
+#         self.get_response = get_response
 
-        # Продолжаем обработку запроса
-        response = self.get_response(request)
-        return response
+#     def __call__(self, request):
+#         # Проверяем наличие нужного заголовка
+#         if '2003' not in request.headers:
+#             return HttpResponseForbidden("Access denied: Missing header")
+
+#         # Продолжаем обработку запроса
+#         response = self.get_response(request)
+#         return response
 
 
 class JWTAuthenticationMiddleware(MiddlewareMixin):
@@ -34,7 +36,7 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
             token = auth_header.split(' ')[1]
 
             # Проверяем и декодируем токен
-            payload = jwt.decode(token, '2003', algorithms=['HS256'])
+            payload = jwt.decode(token, config.jws_secret_access_key, algorithms=['HS256'])
 
             # Вы можете добавить объект пользователя в request, если это необходимо
             request.user_id = payload.get('user_id')  # Предполагается, что в токене есть поле user_id
@@ -44,3 +46,5 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
             return JsonResponse({'error': 'Token has expired'}, status=401)
         except jwt.InvalidTokenError:
             return JsonResponse({'error': 'Invalid token'}, status=401)
+
+

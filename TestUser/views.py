@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import permission_classes
 
 
 from drf_yasg.utils import swagger_auto_schema
@@ -13,11 +14,12 @@ from .user_renderer import UserJSONRenderer
 
 
 
+@permission_classes([AllowAny])
 class RegistrationAPIView(APIView):
     """
     Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
     """
-    permission_classes = (AllowAny,)
+    # permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
     parser_classes = [MultiPartParser, FormParser]
     # renderer_classes = (UserJSONRenderer)
