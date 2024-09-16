@@ -211,6 +211,17 @@ REST_FRAMEWORK = {
 }
 
 
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'bearerAuth': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
+
+
 
 #jwt
 JWS_SECRET_ACCESS_KEY = config.jws_secret_access_key

@@ -69,7 +69,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         # Разделяем заголовок на префикс и токен
         auth_header = auth_header.split()
         if len(auth_header) != 2 or auth_header[0].lower() != self.authentication_header_prefix.lower():
-            raise PermissionDenied(('Неправильный формат заголовка аутентификации'))
+            raise exceptions.AuthenticationFailed('Неправильный формат заголовка аутентификации')
         token = auth_header[1]
         return self._authenticate_credentials(request, token)
 
@@ -78,19 +78,20 @@ class JWTAuthentication(authentication.BaseAuthentication):
             # Декодирование JWT
             payload = jwt.decode(token, JWS_SECRET_ACCESS_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
-            raise PermissionDenied(('Токен истек'))
+            raise exceptions.AuthenticationFailed('Токен истек')
         except jwt.InvalidTokenError:
-            raise PermissionDenied(('Невозможно декодировать токен'))
+            raise exceptions.AuthenticationFailed('Невозможно декодировать токен')
 
         # Проверяем существование пользователя
         try:
             user = User.objects.get(pk=payload['id'])
         except User.DoesNotExist:
-            raise PermissionDenied(('Пользователь не найден'))
+            raise exceptions.AuthenticationFailed('Пользователь не найден')
 
         if not user.is_active:
-            raise PermissionDenied(('Пользователь деактивирован'))
+            raise exceptions.AuthenticationFailed('Пользователь деактивирован')
 
         # Устанавливаем пользователя в запрос
         request.user = user
-        return user
+
+        return (user, token)
