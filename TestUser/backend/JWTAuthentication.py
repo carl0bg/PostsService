@@ -5,56 +5,133 @@ from rest_framework import authentication, exceptions, status
 
 from PostsService.settings import JWS_SECRET_ACCESS_KEY
 from TestUser.models import User
+from .token import Token, AccessToken
 
 
+from django.contrib.auth import get_user_model
 
-from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse
+from rest_framework.request import Request
+
+from typing import Optional, Set, Tuple, TypeVar
+
+
 
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
-    authentication_header_prefix = 'Bearer'
 
-    def authenticate(self, request):
+
+    www_authenticate_realm = "api"
+    media_type = "application/json"
+    auth_header_type_bytes = 'Bearer'
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.user_model = get_user_model()
+
+    def authenticate(self, request: Request) -> Optional[Tuple[User, Token]]:
+        header = self.get_header(request)
+        if header is None:
+            return None
+
+        raw_token = self.get_raw_token(header)
+        if raw_token is None:
+            return None
+
+        validated_token = self.get_validated_token(raw_token)
+
+        return self.get_user(validated_token), validated_token
+
+    # def authenticate_header(self, request: Request) -> str:
+    #     return '{} realm="{}"'.format(
+    #         AUTH_HEADER_TYPES[0],
+    #         self.www_authenticate_realm,
+    #     )
+
+    def get_header(self, request: Request) -> bytes:
+
+        header = request.META.get('HTTP_AUTHORIZATION')
+
+        if isinstance(header, str):
+            # Work around django test client oddness
+            header = header.encode()
+
+        return header
+
+    def get_raw_token(self, header: bytes) -> Optional[bytes]:
+        """
+        Extracts an unvalidated JSON web token from the given "Authorization"
+        header value.
+        """
+        parts = header.split()
+
+        if len(parts) == 0:
+            return None
+
+        if parts[0] not in self.auth_header_type_bytes:
+            return None
+
+        if len(parts) != 2:
+            raise ("Authorization header must contain two space-delimited values") #TODO
+
+        return parts[1]
+
+    def get_validated_token(self, raw_token: bytes) -> Token:
+        """
+        Validates an encoded JSON web token and returns a validated token
+        wrapper object.
+        """
+        messages = []
+        try:
+            return AccessToken(raw_token)
+        # except TokenError as e:  #TODO
+        #     messages.append(
+        #         {
+        #             "token_class": AuthToken.__name__,
+        #             "token_type": AuthToken.token_type,
+        #             "message": e.args[0],
+        #         }
+        #     )
+        except Exception:
+            print('Error')
+
+
+        # raise InvalidToken(
+        #     {
+        #         "detail": _("Given token not valid for any token type"),
+        #         "messages": messages,
+        #     }
+        # )
+
+    def get_user(self, validated_token: Token) -> User:
+        try:
+            user_id = validated_token['user_id']
+        except KeyError:
+            # raise InvalidToken(_("Token contained no recognizable user identification"))
+            ... #TODO
 
         try:
-            # Получаем заголовок Authorization
-            auth_header = request.headers.get('Authorization')
-            if not auth_header:
-                return None  # Токен отсутствует, возвращаем None
-
-            # Разделяем заголовок на префикс и токен
-            auth_header = auth_header.split()
-            if len(auth_header) != 2 or auth_header[0].lower() != self.authentication_header_prefix.lower():
-                # raise exceptions.AuthenticationFailed('Неправильный формат заголовка аутентификации')
-                return JsonResponse({'detail': 'Неправильный формат заголовка аутентификации'}, status=status.HTTP_400_BAD_REQUEST)
-
-            token = auth_header[1]
-            return self._authenticate_credentials(request, token)
-        except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-    def _authenticate_credentials(self, request, token):
-        try:
-            # Декодирование JWT
-            payload = jwt.decode(token, JWS_SECRET_ACCESS_KEY, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            return JsonResponse({'detail': 'Токен истек'}, status=status.HTTP_401_UNAUTHORIZED)
-        except jwt.InvalidTokenError:
-            return JsonResponse({'detail': 'Невалидный токен'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Проверяем существование пользователя
-        try:
-            user = User.objects.get(pk=payload['id'])
-        except User.DoesNotExist:
-            return JsonResponse({'detail': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)
+            user = self.user_model.objects.get(**{'id': user_id})
+        except self.user_model.DoesNotExist:
+            # raise AuthenticationFailed(_("User not found"), code="user_not_found")
+            ...
 
         if not user.is_active:
-            return JsonResponse({'detail': 'Пользователь деактивирован'}, status=status.HTTP_403_FORBIDDEN)
+            # raise AuthenticationFailed(_("User is inactive"), code="user_inactive")
+            ...
 
-        # Устанавливаем пользователя в запрос
-        request.user = user
+        # if api_settings.CHECK_REVOKE_TOKEN: #TODO для отзывания  токена
+        #     if validated_token.get(
+        #         api_settings.REVOKE_TOKEN_CLAIM
+        #     ) != get_md5_hash_password(user.password):
+        #         raise AuthenticationFailed(
+        #             _("The user's password has been changed."), code="password_changed"
+        #         )
 
-        return (user, token)
+        return user
+
+
+
+
+def default_user_authentication_rule(user: User) -> bool:
+    return user is not None and user.is_active
