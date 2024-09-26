@@ -65,6 +65,24 @@ class Token:
             # Set "jti" claim
             self.set_jti()
 
+    def __repr__(self) -> str:
+        return repr(self.payload)
+
+    def __getitem__(self, key: str):
+        return self.payload[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.payload[key] = value
+
+    def __delitem__(self, key: str) -> None:
+        del self.payload[key]
+
+
+    
+    def __contains__(self, key: str) -> Any:
+        return key in self.payload
+
+
 
     def decode(self):
         try:
