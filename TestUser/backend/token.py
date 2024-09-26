@@ -160,16 +160,16 @@ class Token:
         after authenticating the user's credentials.
         """
 
-        id_fields = 'id'    
+        user_id = getattr(user, 'id')
 
-        user_id = getattr(user, id_fields)
         if not isinstance(user_id, int):
             user_id = str(user_id)
 
         token = cls()
-        # token[id_fields] = user_id
-
+        print(token)
+        token['id'] = user_id
         return token
+    
 
 ########################################################
 
