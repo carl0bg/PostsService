@@ -101,16 +101,12 @@ class Token:
         Returns an encoded token for the given payload dictionary.
         """
         jwt_payload = payload.copy()
-        if self.audience is not None:
-            jwt_payload["aud"] = self.audience
-        if self.issuer is not None:
-            jwt_payload["iss"] = self.issuer
+
 
         token = jwt.encode(
             jwt_payload,
-            self.signing_key,
+            self.secret_key,
             algorithm=self.algorithm,
-            json_encoder=self.json_encoder,
         )
         if isinstance(token, bytes):
             return token.decode("utf-8")
