@@ -14,6 +14,21 @@ from TestUser.backend.serializers import MyTokenObtainPairSerializer, TokenObtai
 # from .settings import api_settings
 
 
+class InvalidToken():
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = "Token is invalid or expired"
+    default_code = "token_not_valid"
+
+
+
+class TokenError(Exception):
+    pass
+
+
+
+
+
+
 class TokenViewBase(generics.GenericAPIView):
     permission_classes = ()
     authentication_classes = ()
@@ -29,12 +44,17 @@ class TokenViewBase(generics.GenericAPIView):
 
         if self.serializer_class:
             return self.serializer_class
-        try:
-            return import_string(self._serializer_class)
-        except ImportError:
-            msg = "Could not import serializer '%s'" % self._serializer_class
-            raise ImportError(msg)
+        # try:
+        #     return import_string(self._serializer_class)
+        # except ImportError:
+        #     msg = "Could not import serializer '%s'" % self._serializer_class
+        #     raise ImportError(msg)
 
+    def get_authenticate_header(self, request: Request) -> str:
+        return '{} realm="{}"'.format(
+            'Bearer',
+            self.www_authenticate_realm,
+        )
 
     @swagger_auto_schema(
         operation_description="Token_access_refresh",
@@ -42,11 +62,12 @@ class TokenViewBase(generics.GenericAPIView):
         responses={201: serializer_class(many=False)}
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
+        serializer = self.get_serializer(data=request.data)
+
         try:
-            serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-        except Exception as e: #TODO
-            print(e)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
 
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
@@ -56,7 +77,7 @@ class TokenObtainPairView(TokenViewBase): #use
     """
     return access and refresh JSON 
     """
-    serializer_class = MyTokenObtainPairSerializer
+    # serializer_class = MyTokenObtainPairSerializer
     _serializer_class = TokenObtainPairSerializer
 
 

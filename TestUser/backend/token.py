@@ -7,6 +7,8 @@ from TestUser.models import User
 
 
 from .sub_func import aware_utcnow, datetime_from_epoch, datetime_to_epoch
+# from .back import TokenBackend
+
 
 from config.db_const import config
 
@@ -29,7 +31,7 @@ class Token:
 
     algorithm = 'HS256'
     secret_key = config.jws_secret_access_key 
-    leeway = 0  #допустимого отклонения времени валидации JWT
+    # leeway = 0  #допустимого отклонения времени валидации JWT
 
 
     def __init__(self, token = None, verify: bool = True) -> None:  
@@ -42,6 +44,9 @@ class Token:
 
         if token is not None:
             # Decode token
+
+            token_backend = self.get_token_backend()
+
             try:
                 self.payload = self.decode()
             except TokenBackendError:
@@ -162,12 +167,30 @@ class Token:
             user_id = str(user_id)
 
         token = cls()
-        token[id_fields] = user_id
+        # token[id_fields] = user_id
 
         return token
 
+########################################################
 
 
+    _token_backend: Optional["TokenBackend"] = None
+
+    @property
+    def token_backend(self) -> "TokenBackend":
+        if self._token_backend is None:
+            # self._token_backend = import_string( #TODO
+                # "rest_framework_simplejwt.state.token_backend"
+            # )
+            ...
+        return self._token_backend
+
+    def get_token_backend(self) -> "TokenBackend":
+        # Backward compatibility.
+        return self.token_backend
+
+
+###########################################################
     def __str__(self) -> str:
         """
         Signs and returns a token as a base64 encoded string.
