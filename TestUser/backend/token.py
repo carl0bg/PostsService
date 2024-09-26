@@ -45,7 +45,7 @@ class Token:
         if token is not None:
             # Decode token
 
-            token_backend = self.get_token_backend()
+            # token_backend = self.get_token_backend()
 
             try:
                 self.payload = self.decode()
@@ -128,9 +128,9 @@ class Token:
             raise Exception             #TODO
 
         claim_time = datetime_from_epoch(claim_value) 
-        leeway = self.leeway #разница
+        # leeway = self.leeway #разница
 
-        if claim_time <= current_time - leeway:
+        if claim_time <= current_time:
             raise TokenError('Токен просрочен')     #TODO
         
 
@@ -191,7 +191,7 @@ class Token:
     _token_backend: Optional["TokenBackend"] = None
 
     @property
-    def token_backend(self) -> "TokenBackend":
+    def token_backend(self):
         if self._token_backend is None:
             # self._token_backend = import_string( #TODO
                 # "rest_framework_simplejwt.state.token_backend"
@@ -199,7 +199,7 @@ class Token:
             ...
         return self._token_backend
 
-    def get_token_backend(self) -> "TokenBackend":
+    def get_token_backend(self):
         # Backward compatibility.
         return self.token_backend
 

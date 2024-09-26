@@ -24,7 +24,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     www_authenticate_realm = "api"
     media_type = "application/json"
-    auth_header_type_bytes = 'Bearer'
+    auth_header_type_bytes = b'Bearer'
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -50,7 +50,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
     #     )
 
     def get_header(self, request: Request) -> bytes:
-
+        '''return b'token'''
         header = request.META.get('HTTP_AUTHORIZATION')
 
         if isinstance(header, str):
@@ -106,7 +106,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     def get_user(self, validated_token: Token) -> User:
         try:
-            user_id = validated_token['user_id']
+            user_id = validated_token['id']
         except KeyError:
             # raise InvalidToken(_("Token contained no recognizable user identification"))
             ... #TODO
