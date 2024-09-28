@@ -4,6 +4,7 @@ from rest_framework import authentication, exceptions, status
 
 
 from PostsService.settings import JWS_SECRET_ACCESS_KEY
+from TestUser.backend.exception import TokenCompError, TokenError
 from TestUser.models import User
 from .token import Token, AccessToken
 
@@ -61,8 +62,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     def get_raw_token(self, header: bytes) -> Optional[bytes]:
         """
-        Extracts an unvalidated JSON web token from the given "Authorization"
-        header value.
+        Доп проверки, return token (непроверенный)
         """
         parts = header.split()
 
@@ -79,22 +79,13 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     def get_validated_token(self, raw_token: bytes) -> Token:
         """
-        Validates an encoded JSON web token and returns a validated token
-        wrapper object.
+        Проверка токена 
         """
         messages = []
         try:
             return AccessToken(raw_token)
-        # except TokenError as e:  #TODO
-        #     messages.append(
-        #         {
-        #             "token_class": AuthToken.__name__,
-        #             "token_type": AuthToken.token_type,
-        #             "message": e.args[0],
-        #         }
-        #     )
-        except Exception:
-            print('Error')
+        except TokenError as e: 
+            raise TokenCompError
 
 
         # raise InvalidToken(

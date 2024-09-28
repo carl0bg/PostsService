@@ -7,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from typing import Optional
 
-from TestUser.backend.serializers import MyTokenObtainPairSerializer, TokenObtainPairSerializer, TokenRefreshSerializer
+from TestUser.backend.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 # from .authentication import AUTH_HEADER_TYPES
 # from .exceptions import InvalidToken, TokenError
@@ -35,7 +35,7 @@ class TokenViewBase(generics.GenericAPIView):
 
     # serializer_class = Optional[MyTokenObtainPairSerializer]
     # serializer_class = None
-    serializer_class = MyTokenObtainPairSerializer
+    serializer_class = TokenObtainPairSerializer
     _serializer_class = ""
 
     www_authenticate_realm = "api"
