@@ -121,15 +121,3 @@ class TokenRefreshSerializer(serializers.Serializer):
         return data
 
 
-
-# class TokenObtainSlidingSerializer(TokenObtainSerializer):
-#     token_class = SlidingToken
-
-#     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
-#         data = super().validate(attrs)
-
-#         token = self.get_token(self.user)
-
-#         data["token"] = str(token)
-
-#         return data

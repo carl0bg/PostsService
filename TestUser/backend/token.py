@@ -7,6 +7,7 @@ from TestUser.models import User
 
 
 from .sub_func import aware_utcnow, datetime_from_epoch, datetime_to_epoch
+from .exception import TokenBackendError, TokenError
 # from .back import TokenBackend
 
 
@@ -15,12 +16,6 @@ from config.db_const import config
 
 
 
-class TokenError(Exception):
-    pass
-
-
-class TokenBackendError(Exception):
-    pass
 
 
 
@@ -31,34 +26,26 @@ class Token:
 
     algorithm = 'HS256'
     secret_key = config.jws_secret_access_key 
-    # leeway = 0  #допустимого отклонения времени валидации JWT
 
 
     def __init__(self, token = None, verify: bool = True) -> None:  
-        # if self.token_type is None or self.life_time is None:  # TODO нужно убрать
-            # raise TokenError(_("Cannot create token with no type or lifetime"))
 
         self.token = token
         self.current_time = aware_utcnow()
 
 
-        if token is not None:
-            # Decode token
-
-            # token_backend = self.get_token_backend()
-
+        if token is not None: 
             try:
                 self.payload = self.decode()
             except TokenBackendError:
-                raise TokenError("Token is invalid or expired")
+                raise TokenError("Токен недействителен или срок действия истек")
 
             if verify:
-                self.verify()  # TODO current
+                self.verify() 
         else:
             # New token.
-            self.payload = {'token_type': self.token_type} # TODO 
+            self.payload = {'token_type': self.token_type} 
 
-            # Set "exp" and "iat" claims with default value
             self.set_exp(from_time=self.current_time, lifetime=self.life_time)
             self.set_iat(at_time=self.current_time)
 
@@ -117,47 +104,44 @@ class Token:
 
 
 
-    def check_time(self, claim: str = "exp", current_time: Optional[datetime] = None) -> None:
+    def check_time(self, current_time: Optional[datetime] = None) -> None:
         
         if current_time is None:
             current_time = self.current_time
 
         try:
-            claim_value = self.payload[claim]
+            claim_value = self.payload['exp']
         except KeyError:
-            raise Exception             #TODO
+            raise TokenError("В токене отсутствует 'exp'")
 
         claim_time = datetime_from_epoch(claim_value) 
-        # leeway = self.leeway #разница
 
         if claim_time <= current_time:
-            raise TokenError('Токен просрочен')     #TODO
+            raise TokenError('Токен просрочен')
         
 
 
-    def set_exp(
-            self,
-            claim: str = "exp",
-            from_time: Optional[datetime] = None,
-            lifetime: Optional[timedelta] = None,
-        ) -> None:
-            if from_time is None:
-                from_time = self.current_time
+    def set_exp(self, from_time: Optional[datetime] = None, lifetime: Optional[timedelta] = None) -> None:
+        '''Установка время истечения'''
+        if from_time is None:
+            from_time = self.current_time
 
-            if lifetime is None:
-                lifetime = self.lifetime
+        if lifetime is None:
+            lifetime = self.lifetime
 
-            self.payload[claim] = datetime_to_epoch(from_time + lifetime)
+        self.payload['exp'] = datetime_to_epoch(from_time + lifetime)
 
 
-    def set_iat(self, claim: str = "iat", at_time: Optional[datetime] = None) -> None:
+    def set_iat(self, at_time: Optional[datetime] = None) -> None:
+        '''время выдачи токена'''
         if at_time is None:
             at_time = self.current_time
 
-        self.payload[claim] = datetime_to_epoch(at_time)
+        self.payload['iat'] = datetime_to_epoch(at_time)
 
 
     def set_jti(self) -> None:
+        '''уникальный идентификатор токена'''
         self.payload['jti'] = uuid4().hex
 
 
@@ -180,7 +164,6 @@ class Token:
             user_id = str(user_id)
 
         token = cls()
-        print(token)
         token['id'] = user_id
         return token
     
@@ -200,7 +183,6 @@ class Token:
         return self._token_backend
 
     def get_token_backend(self):
-        # Backward compatibility.
         return self.token_backend
 
 
@@ -233,10 +215,6 @@ class RefreshToken(Token):
     def access_token(self) -> AccessToken:
         access = self.access_token_class()
 
-        # Use instantiation time of refresh token as relative timestamp for
-        # access token "exp" claim.  This ensures that both a refresh and
-        # access token expire relative to the same time if they are created as
-        # a pair.
         access.set_exp(from_time=self.current_time)
 
         no_copy = self.no_copy_claims
