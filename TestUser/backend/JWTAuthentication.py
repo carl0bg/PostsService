@@ -4,7 +4,7 @@ from rest_framework import authentication, exceptions, status
 
 
 from PostsService.settings import JWS_SECRET_ACCESS_KEY
-from TestUser.backend.exception import TokenCompError, TokenError
+from TestUser.backend.exception import InvalidToken, TokenCompError, TokenError
 from TestUser.models import User
 from .token import Token, AccessToken
 
@@ -70,10 +70,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
             return None
 
         if parts[0] not in self.auth_header_type_bytes:
-            return None
+            raise TokenCompError()
 
         if len(parts) != 2:
-            raise ("Authorization header must contain two space-delimited values") #TODO
+            raise TokenCompError()
 
         return parts[1]
 
@@ -81,44 +81,28 @@ class JWTAuthentication(authentication.BaseAuthentication):
         """
         Проверка токена 
         """
-        messages = []
         try:
             return AccessToken(raw_token)
         except TokenError as e: 
             raise TokenCompError
-
-
-        # raise InvalidToken(
-        #     {
-        #         "detail": _("Given token not valid for any token type"),
-        #         "messages": messages,
-        #     }
-        # )
+        
 
     def get_user(self, validated_token: Token) -> User:
         try:
             user_id = validated_token['id']
         except KeyError:
-            # raise InvalidToken(_("Token contained no recognizable user identification"))
-            ... #TODO
+            raise InvalidToken()
 
         try:
             user = self.user_model.objects.get(**{'id': user_id})
         except self.user_model.DoesNotExist:
             # raise AuthenticationFailed(_("User not found"), code="user_not_found")
-            ...
+            print('писька')
+            raise InvalidToken(detail='Пользователь с указанным id не найден в базе данных')
 
         if not user.is_active:
             # raise AuthenticationFailed(_("User is inactive"), code="user_inactive")
             ...
-
-        # if api_settings.CHECK_REVOKE_TOKEN: #TODO для отзывания  токена
-        #     if validated_token.get(
-        #         api_settings.REVOKE_TOKEN_CLAIM
-        #     ) != get_md5_hash_password(user.password):
-        #         raise AuthenticationFailed(
-        #             _("The user's password has been changed."), code="password_changed"
-        #         )
 
         return user
 

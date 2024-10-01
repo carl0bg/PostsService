@@ -1,4 +1,4 @@
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, AuthenticationFailed
 
 
 
@@ -14,5 +14,13 @@ class TokenError(Exception):
 
 class TokenCompError(APIException):
     status_code = 401
-    default_detail = 'Given token not valid'
-    default_code = 'Given token not valid'
+    default_detail = 'Данный токен недействителен'
+    default_code = "token_not_valid"
+
+
+class InvalidToken(AuthenticationFailed):
+    status_code = 401
+    default_detail = "Token is invalid or expired"
+    default_code = "token_not_valid"
+
+
