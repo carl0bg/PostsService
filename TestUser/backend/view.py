@@ -5,11 +5,11 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from drf_yasg.utils import swagger_auto_schema
 
-from typing import Optional
+from typing import Optional, Union
 
 from TestUser.backend.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
-from .exception import InvalidToken, TokenError
+from .exception import InvalidToken, ParsesError, TokenError
 
 
 
@@ -19,18 +19,10 @@ from .exception import InvalidToken, TokenError
 class TokenViewBase(generics.GenericAPIView):
     permission_classes = ()
     authentication_classes = ()
-
-    # serializer_class = Optional[MyTokenObtainPairSerializer]
-    # serializer_class = None
-    serializer_class = TokenObtainPairSerializer
-    _serializer_class = ""
+    serializer_class = None
 
     www_authenticate_realm = "api"
 
-    def get_serializer_class(self) -> Serializer:
-        if self.serializer_class:
-            return self.serializer_class
-        
 
     def get_authenticate_header(self, request: Request) -> str:
         return '{} realm="{}"'.format(
@@ -38,13 +30,9 @@ class TokenViewBase(generics.GenericAPIView):
             self.www_authenticate_realm,
         )
 
-    @swagger_auto_schema(
-        operation_description="Token_access_refresh",
-        request_body= serializer_class,
-        responses={201: serializer_class(many=False)}
-    )
+
     def post(self, request: Request, *args, **kwargs) -> Response:
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
 
         try:
             serializer.is_valid(raise_exception=True)
@@ -59,11 +47,24 @@ class TokenObtainPairView(TokenViewBase): #use
     """
     return access and refresh JSON 
     """
-    # serializer_class = MyTokenObtainPairSerializer
-    _serializer_class = TokenObtainPairSerializer
+    serializer_class = TokenObtainPairSerializer
+
+    @swagger_auto_schema(
+        operation_description="Token_access_refresh",
+        request_body= serializer_class,
+        responses={201: serializer_class(many=False)}
+    )
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            response = super().post(request, *args, **kwargs)
+        except: 
+            raise ParsesError()
+        return response
+
+        
 
 
-token_obtain_pair = TokenObtainPairView.as_view()
+# token_obtain_pair = TokenObtainPairView.as_view()
 
 
 class TokenRefreshView(TokenViewBase):
@@ -71,9 +72,24 @@ class TokenRefreshView(TokenViewBase):
     Takes a refresh type JSON web token and returns an access type JSON web
     token if the refresh token is valid.TokenRefreshSerializer
     """
+    serializer_class = TokenRefreshSerializer
 
-    _serializer_class = TokenRefreshSerializer
+
+    @swagger_auto_schema(
+        operation_description="Token_refresh",
+        request_body= serializer_class,
+        responses={201: serializer_class(many=False)}
+    )
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            response = super().post(request, *args, **kwargs)
+        except: 
+            raise ParsesError()
+        return response
+
+        
 
 
-token_refresh = TokenRefreshView.as_view()
+
+# token_refresh = TokenRefreshView.as_view()
 

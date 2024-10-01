@@ -1,4 +1,4 @@
-from rest_framework.exceptions import APIException, AuthenticationFailed
+from rest_framework.exceptions import APIException, AuthenticationFailed, ParseError
 
 
 
@@ -24,3 +24,6 @@ class InvalidToken(AuthenticationFailed):
     default_code = "token_not_valid"
 
 
+class ParsesError(ParseError):
+    pass
+    
