@@ -49,7 +49,6 @@ class Token:
             self.set_exp(from_time=self.current_time, lifetime=self.life_time)
             self.set_iat(at_time=self.current_time)
 
-            # Set "jti" claim
             self.set_jti()
 
     def __repr__(self) -> str:
@@ -171,25 +170,25 @@ class Token:
 ########################################################
 
 
-    _token_backend: Optional["TokenBackend"] = None
+    # _token_backend: Optional["TokenBackend"] = None
 
-    @property
-    def token_backend(self):
-        if self._token_backend is None:
-            # self._token_backend = import_string( #TODO
-                # "rest_framework_simplejwt.state.token_backend"
-            # )
-            ...
-        return self._token_backend
+    # @property
+    # def token_backend(self):
+    #     if self._token_backend is None:
+    #         # self._token_backend = import_string( #TODO
+    #             # "rest_framework_simplejwt.state.token_backend"
+    #         # )
+    #         ...
+    #     return self._token_backend
 
-    def get_token_backend(self):
-        return self.token_backend
+    # def get_token_backend(self):
+    #     return self.token_backend
 
 
 ###########################################################
     def __str__(self) -> str:
         """
-        Signs and returns a token as a base64 encoded string.
+        return a token as a base64
         """
         return self.encode(self.payload)
 

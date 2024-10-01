@@ -29,5 +29,4 @@ def datetime_from_epoch(ts: float) -> datetime:
 
 
 def datetime_to_epoch(dt: datetime) -> int:
-    ''''''
     return timegm(dt.utctimetuple())

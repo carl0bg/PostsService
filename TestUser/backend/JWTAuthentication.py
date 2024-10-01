@@ -44,11 +44,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         return self.get_user(validated_token), validated_token
 
-    # def authenticate_header(self, request: Request) -> str:
-    #     return '{} realm="{}"'.format(
-    #         AUTH_HEADER_TYPES[0],
-    #         self.www_authenticate_realm,
-    #     )
+
 
     def get_header(self, request: Request) -> bytes:
         '''return b'token'''
@@ -88,6 +84,9 @@ class JWTAuthentication(authentication.BaseAuthentication):
         
 
     def get_user(self, validated_token: Token) -> User:
+        '''
+        Получения пользователя по id
+        '''
         try:
             user_id = validated_token['id']
         except KeyError:
@@ -96,14 +95,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
         try:
             user = self.user_model.objects.get(**{'id': user_id})
         except self.user_model.DoesNotExist:
-            # raise AuthenticationFailed(_("User not found"), code="user_not_found")
-            print('писька')
             raise InvalidToken(detail='Пользователь с указанным id не найден в базе данных')
 
         if not user.is_active:
-            # raise AuthenticationFailed(_("User is inactive"), code="user_inactive")
-            ...
-
+            raise InvalidToken(detail= 'Пользователь неактивен')
+        
         return user
 
 

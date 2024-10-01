@@ -9,20 +9,7 @@ from typing import Optional
 
 from TestUser.backend.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
-# from .authentication import AUTH_HEADER_TYPES
-# from .exceptions import InvalidToken, TokenError
-# from .settings import api_settings
-
-
-class InvalidToken():
-    status_code = status.HTTP_401_UNAUTHORIZED
-    default_detail = "Token is invalid or expired"
-    default_code = "token_not_valid"
-
-
-
-class TokenError(Exception):
-    pass
+from .exception import InvalidToken, TokenError
 
 
 
@@ -41,14 +28,9 @@ class TokenViewBase(generics.GenericAPIView):
     www_authenticate_realm = "api"
 
     def get_serializer_class(self) -> Serializer:
-
         if self.serializer_class:
             return self.serializer_class
-        # try:
-        #     return import_string(self._serializer_class)
-        # except ImportError:
-        #     msg = "Could not import serializer '%s'" % self._serializer_class
-        #     raise ImportError(msg)
+        
 
     def get_authenticate_header(self, request: Request) -> str:
         return '{} realm="{}"'.format(
@@ -87,7 +69,7 @@ token_obtain_pair = TokenObtainPairView.as_view()
 class TokenRefreshView(TokenViewBase):
     """
     Takes a refresh type JSON web token and returns an access type JSON web
-    token if the refresh token is valid.
+    token if the refresh token is valid.TokenRefreshSerializer
     """
 
     _serializer_class = TokenRefreshSerializer
