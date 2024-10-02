@@ -2,8 +2,9 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import permission_classes
+
 
 
 from drf_yasg.utils import swagger_auto_schema
@@ -62,28 +63,14 @@ class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     # renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    # parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [JSONParser]
 
 
 
     @swagger_auto_schema(
         operation_description="Login",
-        manual_parameters=[
-            openapi.Parameter(
-                'username',
-                openapi.IN_FORM,
-                description="username",
-                type=openapi.TYPE_STRING,
-                required=True,
-            ),
-            openapi.Parameter(
-                'password',
-                openapi.IN_FORM,
-                description="password",
-                type=openapi.TYPE_STRING,
-                required=True,
-            ),
-        ],
+        request_body= serializer_class,
         responses={201: serializer_class(many=False)}
     )
     def post(self, request, *args, **kwargs):

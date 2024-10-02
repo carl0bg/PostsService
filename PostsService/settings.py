@@ -52,7 +52,7 @@ INSTALLED_APPS = DJANGO_BASE_APPS + PROJECT_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # 'django.contrib.sessions.middleware.SessionMiddleware',  #управляет сеансами по запросам. #TODO
-    'PostsService.middleware.JWTAuthenticationMiddleware', #my middleware for token
+    # 'PostsService.middleware.JWTAuthenticationMiddleware', #my middleware for token
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     # 'django.contrib.auth.middleware.AuthenticationMiddleware',  #связывает пользователей с запросами с помощью сеансов. #TODO

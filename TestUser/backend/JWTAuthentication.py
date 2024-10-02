@@ -4,57 +4,106 @@ from rest_framework import authentication, exceptions, status
 
 
 from PostsService.settings import JWS_SECRET_ACCESS_KEY
+from TestUser.backend.exception import InvalidToken, TokenCompError, TokenError
 from TestUser.models import User
+from .token import Token, AccessToken
 
 
 
-from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+
+from rest_framework.request import Request
+
+from typing import Optional, Set, Tuple, TypeVar
+
+
 
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
-    authentication_header_prefix = 'Bearer'
 
-    def authenticate(self, request):
+
+    www_authenticate_realm = "api"
+    media_type = "application/json"
+    auth_header_type_bytes = b'Bearer'
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.user_model = get_user_model()
+
+    def authenticate(self, request: Request) -> Optional[Tuple[User, Token]]:
+        header = self.get_header(request)
+        if header is None:
+            return None
+
+        raw_token = self.get_raw_token(header)
+        if raw_token is None:
+            return None
+
+        validated_token = self.get_validated_token(raw_token)
+
+        return self.get_user(validated_token), validated_token
+
+
+
+    def get_header(self, request: Request) -> bytes:
+        '''return b'token'''
+        header = request.META.get('HTTP_AUTHORIZATION')
+
+        if isinstance(header, str):
+            # Work around django test client oddness
+            header = header.encode()
+
+        return header
+
+    def get_raw_token(self, header: bytes) -> Optional[bytes]:
+        """
+        Доп проверки, return token (непроверенный)
+        """
+        parts = header.split()
+
+        if len(parts) == 0:
+            return None
+
+        if parts[0] not in self.auth_header_type_bytes:
+            raise TokenCompError()
+
+        if len(parts) != 2:
+            raise TokenCompError()
+
+        return parts[1]
+
+    def get_validated_token(self, raw_token: bytes) -> Token:
+        """
+        Проверка токена 
+        """
+        try:
+            return AccessToken(raw_token)
+        except TokenError as e: 
+            raise TokenCompError
+        
+
+    def get_user(self, validated_token: Token) -> User:
+        '''
+        Получения пользователя по id
+        '''
+        try:
+            user_id = validated_token['id']
+        except KeyError:
+            raise InvalidToken()
 
         try:
-            # Получаем заголовок Authorization
-            auth_header = request.headers.get('Authorization')
-            if not auth_header:
-                return None  # Токен отсутствует, возвращаем None
-
-            # Разделяем заголовок на префикс и токен
-            auth_header = auth_header.split()
-            if len(auth_header) != 2 or auth_header[0].lower() != self.authentication_header_prefix.lower():
-                # raise exceptions.AuthenticationFailed('Неправильный формат заголовка аутентификации')
-                return JsonResponse({'detail': 'Неправильный формат заголовка аутентификации'}, status=status.HTTP_400_BAD_REQUEST)
-
-            token = auth_header[1]
-            return self._authenticate_credentials(request, token)
-        except Exception as e:
-            return JsonResponse({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-    def _authenticate_credentials(self, request, token):
-        try:
-            # Декодирование JWT
-            payload = jwt.decode(token, JWS_SECRET_ACCESS_KEY, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            return JsonResponse({'detail': 'Токен истек'}, status=status.HTTP_401_UNAUTHORIZED)
-        except jwt.InvalidTokenError:
-            return JsonResponse({'detail': 'Невалидный токен'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Проверяем существование пользователя
-        try:
-            user = User.objects.get(pk=payload['id'])
-        except User.DoesNotExist:
-            return JsonResponse({'detail': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)
+            user = self.user_model.objects.get(**{'id': user_id})
+        except self.user_model.DoesNotExist:
+            raise InvalidToken(detail='Пользователь с указанным id не найден в базе данных')
 
         if not user.is_active:
-            return JsonResponse({'detail': 'Пользователь деактивирован'}, status=status.HTTP_403_FORBIDDEN)
+            raise InvalidToken(detail= 'Пользователь неактивен')
+        
+        return user
 
-        # Устанавливаем пользователя в запрос
-        request.user = user
 
-        return (user, token)
+
+
+def default_user_authentication_rule(user: User) -> bool:
+    return user is not None and user.is_active
