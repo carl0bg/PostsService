@@ -25,5 +25,6 @@ class InvalidToken(AuthenticationFailed):
 
 
 class ParsesError(ParseError):
-    pass
+    default_detail = 'Неправильный запрос'
+
     

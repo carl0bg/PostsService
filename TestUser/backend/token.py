@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 import jwt
 
+from TestUser.backend.models_blacklist import BlacklistedToken, OutstandingToken
 from TestUser.models import User 
 
 
@@ -223,3 +224,23 @@ class RefreshToken(Token):
             access[claim] = value
 
         return access
+    
+
+
+    def blacklist(self) -> BlacklistedToken:
+        """
+        Добавление токена в Blacklist
+        """
+        jti = self.payload["jti"]
+        exp = self.payload["exp"]
+
+        # Ensure outstanding token exists with given jti
+        token, flag_create = OutstandingToken.objects.get_or_create(
+            jti=jti,
+            defaults={
+                "token": str(self),
+                "expires_at": datetime_from_epoch(exp),
+            },
+        )
+
+        return BlacklistedToken.objects.get_or_create(token=token)
