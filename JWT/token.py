@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 import jwt
 
-from .models import BlacklistedToken, OutstandingToken
+from .models import BlacklistedToken
 from TestUser.models import User 
 
 
@@ -113,11 +113,29 @@ class Token:
             claim_value = self.payload['exp']
         except KeyError:
             raise TokenError("В токене отсутствует 'exp'")
+        
+        try:
+            iat_value = self.payload['iat']
+        except KeyError:
+            raise TokenError("В токене отсутствует 'iat'")
 
-        claim_time = datetime_from_epoch(claim_value) 
 
-        if claim_time <= current_time:
+        claim_value = datetime_from_epoch(claim_value)  #TODO
+        iat_value = datetime_from_epoch(iat_value)
+
+        if claim_value <= current_time:
             raise TokenError('Токен просрочен')
+                                            
+
+        full_lifetime = claim_value - iat_value
+
+        # Оставшееся время жизни
+        remaining_lifetime = claim_value - current_time
+
+         # Если оставшееся время жизни меньше 40% от полного срока жизни, вызвать ошибку
+        if remaining_lifetime < 0.4 * full_lifetime:
+            raise Exception("Token lifetime is less than 40%")
+
         
 
 
@@ -152,7 +170,7 @@ class Token:
 
 
     @classmethod
-    def for_user(cls, user: User):
+    def for_user(cls, user):
         """
         Returns an authorization token for the given user that will be provided
         after authenticating the user's credentials.
@@ -168,25 +186,7 @@ class Token:
         return token
     
 
-########################################################
 
-
-    # _token_backend: Optional["TokenBackend"] = None
-
-    # @property
-    # def token_backend(self):
-    #     if self._token_backend is None:
-    #         # self._token_backend = import_string( #TODO
-    #             # "rest_framework_simplejwt.state.token_backend"
-    #         # )
-    #         ...
-    #     return self._token_backend
-
-    # def get_token_backend(self):
-    #     return self.token_backend
-
-
-###########################################################
     def __str__(self) -> str:
         """
         return a token as a base64
@@ -229,50 +229,47 @@ class RefreshToken(Token):
     def check_blacklist(self) -> None:
         jti = self.payload['jti']
 
-        if BlacklistedToken.objects.filter(
-            token__jti = jti
-        ).exists():
+        if BlacklistedToken.objects.filter(jti = jti).exists():
             raise TokenError("Token is blacklisted")
+        else:
+            return True
 
 
     def verify(self, *args, **kwargs):
-        self.check_blacklist()
-        super().verify(*args, **kwargs)
+        if self.check_blacklist(): #если токена нет в blacklist
+            super().verify(*args, **kwargs)
 
 
     def blacklist(self) -> BlacklistedToken:
         """
-        Добавление токена в Blacklist
+        Проверка токена в Blacklist
         """
         jti = self.payload["jti"]
-        exp = self.payload["exp"]
+        user_id = self.payload["id"]
 
         # Ensure outstanding token exists with given jti
-        token, flag_create = OutstandingToken.objects.get_or_create(
+        token, flag_create = BlacklistedToken.objects.get_or_create(
             jti=jti,
             defaults={
-                "token": str(self),
-                "expires_at": datetime_from_epoch(exp),
+                'user': str(user_id), #TODO исправить ошибку, нужно определиться с типитизацией
+                "jti": jti,
             },
         )
 
-        return BlacklistedToken.objects.get_or_create(token=token)
+        return BlacklistedToken.objects.get_or_create(jti=jti)
 
 
     @classmethod
     def for_user(cls, user: User):
 
         token = super().for_user(user)  
-
-        jti = token['jti']
-        exp = token["exp"]
-
-        OutstandingToken.objects.create(
-            user=user,
-            jti=jti,
-            token=str(token),
-            created_at=token.current_time,
-            expires_at=datetime_from_epoch(exp),
-        )
-
         return token
+
+        # jti = token['jti'] #TODO оставляем одну tbl blacklist, или несколько
+
+        # BlacklistedToken.objects.create(
+        #     user=user,
+        #     jti=jti,
+        # )
+
+        # return token

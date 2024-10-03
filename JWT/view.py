@@ -45,7 +45,7 @@ class TokenViewBase(generics.GenericAPIView):
 
 class TokenObtainPairView(TokenViewBase): #use
     """
-    return access and refresh JSON 
+    return access and refresh JSON
     """
     serializer_class = TokenObtainPairSerializer
 
@@ -55,16 +55,15 @@ class TokenObtainPairView(TokenViewBase): #use
         responses={201: serializer_class(many=False)}
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
-        try:
-            response = super().post(request, *args, **kwargs)
-        except Exception as msg_ex: 
-            raise ParsesError(detail=msg_ex)
+        # try:
+        response = super().post(request, *args, **kwargs)
+        # except Exception as msg_ex: 
+            # raise ParsesError(detail=msg_ex)
         return response
 
         
 
 
-# token_obtain_pair = TokenObtainPairView.as_view()
 
 
 class TokenRefreshView(TokenViewBase):
@@ -81,15 +80,14 @@ class TokenRefreshView(TokenViewBase):
         responses={201: serializer_class(many=False)}
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
-        try:
-            response = super().post(request, *args, **kwargs)
-        except Exception as msg_ex: 
-            raise ParsesError(detail=msg_ex)
+        # try:
+        response = super().post(request, *args, **kwargs)
+        # except Exception as msg_ex: 
+            # raise ParsesError(detail=msg_ex)
         return response
 
         
 
 
 
-# token_refresh = TokenRefreshView.as_view()
 
