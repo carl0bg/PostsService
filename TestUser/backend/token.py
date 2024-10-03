@@ -226,6 +226,19 @@ class RefreshToken(Token):
         return access
     
 
+    def check_blacklist(self) -> None:
+        jti = self.payload['jti']
+
+        if BlacklistedToken.objects.filter(
+            token__jti = jti
+        ).exists():
+            raise TokenError("Token is blacklisted")
+
+
+    def verify(self, *args, **kwargs):
+        self.check_blacklist()
+        super().verify(*args, **kwargs)
+
 
     def blacklist(self) -> BlacklistedToken:
         """
@@ -244,3 +257,22 @@ class RefreshToken(Token):
         )
 
         return BlacklistedToken.objects.get_or_create(token=token)
+
+
+    @classmethod
+    def for_user(cls, user: User):
+
+        token = super().for_user(user)  
+
+        jti = token['jti']
+        exp = token["exp"]
+
+        OutstandingToken.objects.create(
+            user=user,
+            jti=jti,
+            token=str(token),
+            created_at=token.current_time,
+            expires_at=datetime_from_epoch(exp),
+        )
+
+        return token

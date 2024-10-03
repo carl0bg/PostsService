@@ -57,8 +57,8 @@ class TokenObtainPairView(TokenViewBase): #use
     def post(self, request: Request, *args, **kwargs) -> Response:
         try:
             response = super().post(request, *args, **kwargs)
-        except: 
-            raise ParsesError()
+        except Exception as msg_ex: 
+            raise ParsesError(detail=msg_ex)
         return response
 
         
@@ -83,8 +83,8 @@ class TokenRefreshView(TokenViewBase):
     def post(self, request: Request, *args, **kwargs) -> Response:
         try:
             response = super().post(request, *args, **kwargs)
-        except: 
-            raise ParsesError()
+        except Exception as msg_ex: 
+            raise ParsesError(detail=msg_ex)
         return response
 
         
