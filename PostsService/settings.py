@@ -32,10 +32,7 @@ DJANGO_BASE_APPS = [
 
     'drf_yasg',
     'rest_framework',
-    'rest_framework_simplejwt',
     'django_filters',
-
-
 ]
 
 
@@ -198,10 +195,8 @@ REST_FRAMEWORK = {
     # ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'TestUser.backend.JWTAuthentication.JWTAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication', #TODO
+        'TestUser.backend.JWTAuthentication.JWTAuthentication',
     ),
-
 
     # "DEFAULT_SCHEMA_CLASS": 'rest_framework.schemas.coreapi.AutoSchema', #openapi #coreapi
 
