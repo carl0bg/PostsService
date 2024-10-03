@@ -7,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from typing import Optional, Union
 
-from TestUser.backend.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from .serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 from .exception import InvalidToken, ParsesError, TokenError
 

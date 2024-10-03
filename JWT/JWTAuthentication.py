@@ -4,7 +4,7 @@ from rest_framework import authentication, exceptions, status
 
 
 from PostsService.settings import JWS_SECRET_ACCESS_KEY
-from TestUser.backend.exception import InvalidToken, TokenCompError, TokenError
+from .exception import InvalidToken, TokenCompError, TokenError
 from TestUser.models import User
 from .token import Token, AccessToken
 

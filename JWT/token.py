@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 import jwt
 
-from TestUser.backend.models_blacklist import BlacklistedToken, OutstandingToken
+from .models import BlacklistedToken, OutstandingToken
 from TestUser.models import User 
 
 

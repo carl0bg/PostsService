@@ -13,6 +13,7 @@ urlpatterns = [
     path('document_api/', include('document.urls', namespace= 'document_api')),
 
     path('auth_api/', include('TestUser.urls', namespace='users_api')),
+    path('token_api/', include('JWT.urls', namespace='token_api'))
 ]
 
 urlpatterns += swagger_url

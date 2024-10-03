@@ -42,6 +42,7 @@ PROJECT_APPS = [
     'video',
     'document',
     'TestUser',
+    'JWT'
 ]
 
 INSTALLED_APPS = DJANGO_BASE_APPS + PROJECT_APPS
@@ -195,7 +196,7 @@ REST_FRAMEWORK = {
     # ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'TestUser.backend.JWTAuthentication.JWTAuthentication',
+        'JWT.JWTAuthentication.JWTAuthentication',
     ),
 
     # "DEFAULT_SCHEMA_CLASS": 'rest_framework.schemas.coreapi.AutoSchema', #openapi #coreapi

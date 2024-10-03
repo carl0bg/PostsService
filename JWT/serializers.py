@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 from rest_framework.exceptions import ValidationError
 
-from TestUser.backend.JWTAuthentication import default_user_authentication_rule
+from .JWTAuthentication import default_user_authentication_rule
 from TestUser.models import User 
 from .token import RefreshToken, Token
 
