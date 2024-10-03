@@ -120,21 +120,12 @@ class Token:
             raise TokenError("В токене отсутствует 'iat'")
 
 
-        claim_value = datetime_from_epoch(claim_value)  #TODO
+        claim_value = datetime_from_epoch(claim_value) 
         iat_value = datetime_from_epoch(iat_value)
 
         if claim_value <= current_time:
             raise TokenError('Токен просрочен')
                                             
-
-        full_lifetime = claim_value - iat_value
-
-        # Оставшееся время жизни
-        remaining_lifetime = claim_value - current_time
-
-         # Если оставшееся время жизни меньше 40% от полного срока жизни, вызвать ошибку
-        if remaining_lifetime < 0.4 * full_lifetime:
-            raise Exception("Token lifetime is less than 40%")
 
         
 
@@ -200,6 +191,7 @@ class AccessToken(Token):
 
 
 
+
 class RefreshToken(Token):
     token_type = "refresh"
     lifetime = timedelta(days=1)
@@ -259,17 +251,62 @@ class RefreshToken(Token):
         return BlacklistedToken.objects.get_or_create(jti=jti)
 
 
+    def verify(self):
+        return self.check_time()
+        # if flag_old_refresh:
+            # ...
+
+
+    
+
+    # def check_time(self, current_time: Optional[datetime] = None) -> None:
+        
+    #     if current_time is None:
+    #         current_time = self.current_time
+
+    #     try:
+    #         claim_value = self.payload['exp']
+    #     except KeyError:
+    #         raise TokenError("В токене отсутствует 'exp'")
+        
+    #     try:
+    #         iat_value = self.payload['iat']
+    #     except KeyError:
+    #         raise TokenError("В токене отсутствует 'iat'")
+
+
+    #     claim_value = datetime_from_epoch(claim_value)
+    #     iat_value = datetime_from_epoch(iat_value)
+
+    #     if claim_value <= current_time:
+    #         raise TokenError('Токен просрочен')
+                                            
+
+    #     full_lifetime = claim_value - iat_value
+
+    #     # Оставшееся время жизни
+    #     remaining_lifetime = claim_value - current_time
+
+    #      # Если оставшееся время жизни меньше 40% от полного срока жизни, вызвать ошибку
+    #     if remaining_lifetime > 0.4 * full_lifetime:
+    #         return True #вернуть только access
+            
+    # @classmethod
+    # def old_life(cls, current_time: Optional[datetime] = None)-> None:
+
+    #     iat_value = datetime_from_epoch(iat_value)
+    #     claim_value = datetime_from_epoch(claim_value)
+    #     full_lifetime = claim_value - iat_value
+
+    #     # Оставшееся время жизни
+    #     remaining_lifetime = claim_value - current_time
+
+    #     if remaining_lifetime > 0.4 * full_lifetime:
+    #         return True #вернуть только access
+
+
     @classmethod
     def for_user(cls, user: User):
 
         token = super().for_user(user)  
         return token
-
-        # jti = token['jti'] #TODO оставляем одну tbl blacklist, или несколько
-
-        # BlacklistedToken.objects.create(
-        #     user=user,
-        #     jti=jti,
-        # )
-
-        # return token

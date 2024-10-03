@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 from rest_framework.exceptions import ValidationError
 
+from JWT.sub_func import old_life
+
 from .JWTAuthentication import default_user_authentication_rule
 from TestUser.models import User 
 from .token import RefreshToken, Token
@@ -104,14 +106,14 @@ class TokenRefreshSerializer(serializers.Serializer):
 
         data = {"access": str(refresh.access_token)}
 
-        if True:  #TODO надо сделать доп проверку на блеклист
-            try:
-                refresh.blacklist()
-            except AttributeError:
-                # If blacklist app not installed, `blacklist` method will
-                # not be present
-                pass
+        try:
+            refresh.blacklist()
+        except AttributeError:
+            # If blacklist app not installed, `blacklist` method will
+            # not be present
+            pass
 
+        if not old_life(refresh.payload['iat'], refresh.payload['exp']): #если refresh становится старым, выдается новый
             refresh.set_jti()
             refresh.set_exp()
             refresh.set_iat()
