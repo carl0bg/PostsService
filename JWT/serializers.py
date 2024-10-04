@@ -106,12 +106,12 @@ class TokenRefreshSerializer(serializers.Serializer):
 
         data = {"access": str(refresh.access_token)}
 
-        try:
-            refresh.blacklist()
-        except AttributeError:
-            # If blacklist app not installed, `blacklist` method will
-            # not be present
-            pass
+        # try:
+        #     refresh.blacklist() #TODO
+        # except AttributeError:
+        #     # If blacklist app not installed, `blacklist` method will
+        #     # not be present
+        #     pass
 
         if not old_life(refresh.payload['iat'], refresh.payload['exp']): #если refresh становится старым, выдается новый
             refresh.set_jti()

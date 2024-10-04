@@ -55,10 +55,7 @@ class TokenObtainPairView(TokenViewBase): #use
         responses={201: serializer_class(many=False)}
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
-        # try:
         response = super().post(request, *args, **kwargs)
-        # except Exception as msg_ex: 
-            # raise ParsesError(detail=msg_ex)
         return response
 
         
@@ -68,8 +65,7 @@ class TokenObtainPairView(TokenViewBase): #use
 
 class TokenRefreshView(TokenViewBase):
     """
-    Takes a refresh type JSON web token and returns an access type JSON web
-    token if the refresh token is valid.TokenRefreshSerializer
+    получение нового access токена, по истечению access + refresh 
     """
     serializer_class = TokenRefreshSerializer
 
@@ -80,10 +76,7 @@ class TokenRefreshView(TokenViewBase):
         responses={201: serializer_class(many=False)}
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
-        # try:
         response = super().post(request, *args, **kwargs)
-        # except Exception as msg_ex: 
-            # raise ParsesError(detail=msg_ex)
         return response
 
         

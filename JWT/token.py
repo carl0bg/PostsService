@@ -194,7 +194,8 @@ class AccessToken(Token):
 
 class RefreshToken(Token):
     token_type = "refresh"
-    lifetime = timedelta(days=1)
+    # lifetime = timedelta(days=1)
+    lifetime = timedelta(minutes=1)
     no_copy_claims = (
         'token_type',
         "exp",
@@ -243,7 +244,7 @@ class RefreshToken(Token):
         token, flag_create = BlacklistedToken.objects.get_or_create(
             jti=jti,
             defaults={
-                'user': str(user_id), #TODO исправить ошибку, нужно определиться с типитизацией
+                'user': str(user_id),
                 "jti": jti,
             },
         )
@@ -253,56 +254,7 @@ class RefreshToken(Token):
 
     def verify(self):
         return self.check_time()
-        # if flag_old_refresh:
-            # ...
 
-
-    
-
-    # def check_time(self, current_time: Optional[datetime] = None) -> None:
-        
-    #     if current_time is None:
-    #         current_time = self.current_time
-
-    #     try:
-    #         claim_value = self.payload['exp']
-    #     except KeyError:
-    #         raise TokenError("В токене отсутствует 'exp'")
-        
-    #     try:
-    #         iat_value = self.payload['iat']
-    #     except KeyError:
-    #         raise TokenError("В токене отсутствует 'iat'")
-
-
-    #     claim_value = datetime_from_epoch(claim_value)
-    #     iat_value = datetime_from_epoch(iat_value)
-
-    #     if claim_value <= current_time:
-    #         raise TokenError('Токен просрочен')
-                                            
-
-    #     full_lifetime = claim_value - iat_value
-
-    #     # Оставшееся время жизни
-    #     remaining_lifetime = claim_value - current_time
-
-    #      # Если оставшееся время жизни меньше 40% от полного срока жизни, вызвать ошибку
-    #     if remaining_lifetime > 0.4 * full_lifetime:
-    #         return True #вернуть только access
-            
-    # @classmethod
-    # def old_life(cls, current_time: Optional[datetime] = None)-> None:
-
-    #     iat_value = datetime_from_epoch(iat_value)
-    #     claim_value = datetime_from_epoch(claim_value)
-    #     full_lifetime = claim_value - iat_value
-
-    #     # Оставшееся время жизни
-    #     remaining_lifetime = claim_value - current_time
-
-    #     if remaining_lifetime > 0.4 * full_lifetime:
-    #         return True #вернуть только access
 
 
     @classmethod
