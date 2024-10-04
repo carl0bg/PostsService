@@ -72,27 +72,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-    @property
-    def token(self):
-        return self._generate_jwt_token()
     
     def get_full_name(self):
         return self.username
     
-
-    def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(minutes=5)
-
-        token = jwt.encode(
-            {
-                'id':self.pk,
-                'exp':int(dt.strftime('%s'))
-            }, settings.JWS_SECRET_ACCESS_KEY, algorithm= 'HS256'
-        )
-
-        return token
-
-
 
     class Meta:
         db_table = 'users'

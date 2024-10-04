@@ -43,7 +43,7 @@ class TokenViewBase(generics.GenericAPIView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-class TokenObtainPairView(TokenViewBase): #use
+class TokenObtainPairView(TokenViewBase): 
     """
     return access and refresh JSON
     """

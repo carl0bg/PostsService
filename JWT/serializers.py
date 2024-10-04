@@ -52,7 +52,7 @@ class TokenObtainSerializer(serializers.Serializer):
         }
         try:
             authenticate_kwargs["request"] = self.context["request"]
-        except KeyError:
+        except KeyError: #TODO разобрать момент
             pass
 
         self.user = authenticate(**authenticate_kwargs)

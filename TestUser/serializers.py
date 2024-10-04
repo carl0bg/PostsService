@@ -8,23 +8,15 @@ from .models import User
 class RegistrationSerializer(serializers.ModelSerializer):
     """ Сериализация регистрации пользователя и создания нового. """
 
-
-    password = serializers.CharField(
-        max_length=128,
-        min_length=8,
-        write_only=True
-    )
-
-    token = serializers.CharField(max_length=255, read_only=True)
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'token']
-        # fields= '__all__'
+        fields = ['username', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
 
 
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
     
 
 

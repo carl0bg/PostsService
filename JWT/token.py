@@ -194,8 +194,7 @@ class AccessToken(Token):
 
 class RefreshToken(Token):
     token_type = "refresh"
-    # lifetime = timedelta(days=1)
-    lifetime = timedelta(minutes=1)
+    lifetime = timedelta(days=1)
     no_copy_claims = (
         'token_type',
         "exp",
