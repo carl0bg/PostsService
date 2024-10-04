@@ -40,10 +40,12 @@ class RegistrationAPIView2(APIView):
         if serializer.is_valid():
             user: User = serializer.save()
             tokens = TokenObtainPairView().post(request).data
-            return Response({'user': user.username, 'tokens': tokens}, status=status.HTTP_201_CREATED)
+            return Response({'username': user.username, 'tokens': tokens}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+
 
 
 
@@ -52,17 +54,18 @@ class LoginAPIView2(APIView):
     serializer_class = LoginSerializer
     parser_classes = [JSONParser]
 
-
-
     @swagger_auto_schema(
         operation_description="Login",
         request_body= serializer_class,
         responses={201: serializer_class(many=False)}
     )
     def post(self, request, *args, **kwargs):
-        user = request.data
-        serializer = self.serializer_class(data=user)
-        serializer.is_valid(raise_exception=True)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user: User = serializer.validated_data['user']
+            tokens = TokenObtainPairView().post(request).data
+            return Response({'username': user.username, 'tokens': tokens}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
     
