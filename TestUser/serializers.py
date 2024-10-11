@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
+from JWT.models import BlacklistedToken
+
 
 from .models import User
 
@@ -38,3 +40,15 @@ class LoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError('Должны быть предоставлены "username" и "password".')
         return data
+
+
+
+class LogoutSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        return BlacklistedToken.objects.create_user(**validated_data)
+
+
+    class Meta:
+        model = BlacklistedToken
+

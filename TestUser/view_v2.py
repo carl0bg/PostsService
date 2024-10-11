@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -11,6 +11,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from JWT.view import TokenObtainPairView
+from JWT.token import RefreshToken
 
 from .serializers import LoginSerializer, RegistrationSerializer
 from .user_renderer import UserJSONRenderer
@@ -36,7 +37,7 @@ class RegistrationAPIView2(APIView):
     )
     def post(self, request, *args, **kwargs):
 
-        serializer = self.serializer_class(data=request.data )
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user: User = serializer.save()
             tokens = TokenObtainPairView().post(request).data
@@ -69,3 +70,24 @@ class LoginAPIView2(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
+class LogoutAPIView(APIView):
+    """
+    Эндпоинт для разлогинивания пользователя
+    """
+    permission_classes = (IsAuthenticated,)
+    parser_classes = [JSONParser]
+    serializer_class = LoginSerializer
+    
+
+
+    def post(self, request):
+        try:
+            token = request.auth
+
+            # Блокируем токен (делаем его недействительным)
+            # BlacklistedToken.objects.create(token=token)
+            RefreshToken.blacklist(token['refresh'])
+
+            return Response({'detail': 'Logout successful.'}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)

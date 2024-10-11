@@ -231,8 +231,8 @@ class RefreshToken(Token):
         if self.check_blacklist(): #если токена нет в blacklist
             super().verify(*args, **kwargs)
 
-
-    def blacklist(self) -> BlacklistedToken:
+    @classmethod
+    def blacklist(self, refresh_token = None) -> BlacklistedToken:
         """
         Проверка токена в Blacklist
         """
