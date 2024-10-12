@@ -63,3 +63,128 @@ class PostSerializer(serializers.ModelSerializer):
             Document.objects.create(post=instance, **document_data)
 
         return instance
+
+
+
+# class PostSerializer(serializers.ModelSerializer):
+#     videos = serializers.ListField(
+#         child=serializers.FileField(),
+#         required=False
+#     )
+#     photos = serializers.ListField(
+#         child=serializers.ImageField(),
+#         required=False
+#     )
+#     documents = serializers.ListField(
+#         child=serializers.FileField(),
+#         required=False
+#     )
+
+#     class Meta:
+#         model = Posts
+#         fields = ('id', 'created_date', 'modified_date', 'chat', 'text', 'videos', 'photos', 'documents')
+#         read_only_fields = ('created_date', 'modified_date')
+
+#     def create(self, validated_data):
+#         videos_data = validated_data.pop('videos', [])
+#         photos_data = validated_data.pop('photos', [])
+#         documents_data = validated_data.pop('documents', [])
+        
+#         post = Posts.objects.create(**validated_data)
+        
+#         for video_file in videos_data:
+#             Video.objects.create(post=post, file=video_file)
+#         for photo_file in photos_data:
+#             Photo.objects.create(post=post, file=photo_file)
+#         for document_file in documents_data:
+#             Document.objects.create(post=post, file=document_file)
+
+#         return post
+
+#     def update(self, instance, validated_data):
+#         videos_data = validated_data.pop('videos', [])
+#         photos_data = validated_data.pop('photos', [])
+#         documents_data = validated_data.pop('documents', [])
+        
+#         instance.chat = validated_data.get('chat', instance.chat)
+#         instance.text = validated_data.get('text', instance.text)
+#         instance.save()
+        
+#         # Обновляем видео
+#         Video.objects.filter(post=instance).delete()
+#         for video_file in videos_data:
+#             Video.objects.create(post=instance, file=video_file)
+
+#         # Обновляем фото
+#         Photo.objects.filter(post=instance).delete()
+#         for photo_file in photos_data:
+#             Photo.objects.create(post=instance, file=photo_file)
+
+#         # Обновляем документы
+#         Document.objects.filter(post=instance).delete()
+#         for document_file in documents_data:
+#             Document.objects.create(post=instance, file=document_file)
+
+#         return instance
+
+
+# class PostSerializer(serializers.ModelSerializer):
+#     videos = serializers.ListField(
+#         child=serializers.FileField(),
+#         required=False
+#     )
+#     photos = serializers.ListField(
+#         child=serializers.ImageField(),
+#         required=False
+#     )
+#     documents = serializers.ListField(
+#         child=serializers.FileField(),
+#         required=False
+#     )
+
+#     class Meta:
+#         model = Posts
+#         fields = ('id', 'created_date', 'modified_date', 'chat', 'text', 'videos', 'photos', 'documents')
+#         read_only_fields = ('created_date', 'modified_date')
+
+#     def create(self, validated_data):
+#         videos_data = validated_data.pop('videos', [])
+#         photos_data = validated_data.pop('photos', [])
+#         documents_data = validated_data.pop('documents', [])
+        
+#         post = Posts.objects.create(**validated_data)
+        
+#         for video_file in videos_data:
+#             Video.objects.create(post=post, file=video_file)
+#         for photo_file in photos_data:
+#             Photo.objects.create(post=post, file=photo_file)
+#         for document_file in documents_data:
+#             Document.objects.create(post=post, file=document_file)
+
+#         return post
+
+#     def update(self, instance, validated_data):
+#         videos_data = validated_data.pop('videos', [])
+#         photos_data = validated_data.pop('photos', [])
+#         documents_data = validated_data.pop('documents', [])
+        
+#         instance.chat = validated_data.get('chat', instance.chat)
+#         instance.text = validated_data.get('text', instance.text)
+#         instance.save()
+        
+#         # Update videos
+#         Video.objects.filter(post=instance).delete()
+#         for video_file in videos_data:
+#             Video.objects.create(post=instance, file=video_file)
+
+#         # Update photos
+#         Photo.objects.filter(post=instance).delete()
+#         for photo_file in photos_data:
+#             Photo.objects.create(post=instance, file=photo_file)
+
+#         # Update documents
+#         Document.objects.filter(post=instance).delete()
+#         for document_file in documents_data:
+#             Document.objects.create(post=instance, file=document_file)
+
+#         return instance

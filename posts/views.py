@@ -1,4 +1,5 @@
 from rest_framework import generics, viewsets
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .models import Posts
 from .serializers import PostSerializer
@@ -17,3 +18,6 @@ class PostListView(generics.ListCreateAPIView):
 class PostViewSet2(viewsets.ModelViewSet):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    # parser_classes = [MultiPartParser, FormParser]
+
