@@ -236,19 +236,15 @@ class RefreshToken(Token):
         """
         Проверка токена в Blacklist
         """
-        jti = self.payload["jti"]
-        user_id = self.payload["id"]
+        jti = refresh_token.payload["jti"]
+        user_id = refresh_token.payload["id"]
 
         # Ensure outstanding token exists with given jti
-        token, flag_create = BlacklistedToken.objects.get_or_create(
-            jti=jti,
-            defaults={
-                'user': str(user_id),
-                "jti": jti,
-            },
+        BlacklistedToken.objects.create(
+            jti = jti,
+            user = str(user_id),
         )
-
-        return BlacklistedToken.objects.get_or_create(jti=jti)
+        return True
 
 
     def verify(self):

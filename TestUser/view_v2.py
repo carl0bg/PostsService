@@ -13,7 +13,7 @@ from drf_yasg import openapi
 from JWT.view import TokenObtainPairView
 from JWT.token import RefreshToken
 
-from .serializers import LoginSerializer, RegistrationSerializer
+from .serializers import LoginSerializer, RegistrationSerializer, LogoutSerializer
 from .user_renderer import UserJSONRenderer
 from .models import User
 
@@ -74,20 +74,22 @@ class LogoutAPIView(APIView):
     """
     Эндпоинт для разлогинивания пользователя
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     parser_classes = [JSONParser]
-    serializer_class = LoginSerializer
+    serializer_class = LogoutSerializer
     
 
-
+    @swagger_auto_schema(
+        operation_description="Logout",
+        request_body= serializer_class,
+        responses={201: serializer_class(many=False)}
+    )
     def post(self, request):
         try:
-            token = request.auth
+            token = request.data
 
-            # Блокируем токен (делаем его недействительным)
-            # BlacklistedToken.objects.create(token=token)
-            RefreshToken.blacklist(token['refresh'])
+            if RefreshToken.blacklist(RefreshToken(token['refresh'])):
+                return Response({'detail': 'Logout successful.'}, status=status.HTTP_200_OK)
 
-            return Response({'detail': 'Logout successful.'}, status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from typing import Any, Dict
 
 from JWT.models import BlacklistedToken
+from JWT.token import RefreshToken
 
 
 from .models import User
@@ -43,12 +45,26 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-class LogoutSerializer(serializers.ModelSerializer):
+# class LogoutSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        return BlacklistedToken.objects.create_user(**validated_data)
+#     def create(self, validated_data):
+#         return BlacklistedToken.objects.create_user(**validated_data)
 
 
-    class Meta:
-        model = BlacklistedToken
+#     class Meta:
+#         model = BlacklistedToken
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    # access = serializers.CharField(read_only=True)
+    token_class = BlacklistedToken
+
+    def validate(self, attrs):
+        refresh = self.token_class(attrs["refresh"])
+
+        RefreshToken.blacklist()
+        self.token_class.objects.create()
+
+
 
