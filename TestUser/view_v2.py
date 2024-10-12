@@ -58,7 +58,7 @@ class LoginAPIView2(APIView):
     @swagger_auto_schema(
         operation_description="Login",
         request_body= serializer_class,
-        responses={201: serializer_class(many=False)}
+        responses={201: serializer_class(many=False), 400: serializer_class()}
     )
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -82,7 +82,7 @@ class LogoutAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Logout",
         request_body= serializer_class,
-        responses={201: serializer_class(many=False)}
+        responses={200: serializer_class(many=False)}
     )
     def post(self, request):
         try:
