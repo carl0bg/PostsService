@@ -247,8 +247,8 @@ class RefreshToken(Token):
         return True
 
 
-    def verify(self):
-        return self.check_time()
+    # def verify(self):
+    #     return self.check_time()
 
 
 
