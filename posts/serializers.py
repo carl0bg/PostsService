@@ -31,7 +31,7 @@ class PostSerializer(serializers.ModelSerializer):
         
         for video_data in videos_data:
             if videos_data[video_data] is not None:
-                Video.objects.create(post=post, **video_data)
+                Video.objects.create(post=post, file = videos_data[video_data])
         for photo_data in photos_data:
             Photo.objects.create(post=post, file = photos_data[photo_data])
         for document_data in documents_data:
