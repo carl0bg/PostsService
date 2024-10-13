@@ -7,7 +7,7 @@ from .models import Document
         
 class DocumentSerializers(serializers.ModelSerializer):
 
-    file = serializers.FileField()
+    # file = serializers.FileField()
 
     class Meta:
         model = Document

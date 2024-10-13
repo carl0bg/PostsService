@@ -35,7 +35,7 @@ class Posts(models.Model):
     class Meta:
         db_table = 'posts'
 
-    def __str__(self):
-        return f'Post {self.id}'
+    # def __str__(self):
+    #     return f'Post {self.id}'
 
 

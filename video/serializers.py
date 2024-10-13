@@ -7,7 +7,7 @@ from .models import Video
         
 class VideoSerializers(serializers.ModelSerializer):
 
-    file = serializers.FileField()
+    # file = serializers.FileField()
 
     class Meta:
         model = Video

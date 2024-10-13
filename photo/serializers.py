@@ -5,7 +5,7 @@ from .models import Photo
 
 class PhotoSerializers(serializers.ModelSerializer):
 
-    file = serializers.ImageField()
+    # file = serializers.ImageField()
 
     class Meta:
         model = Photo

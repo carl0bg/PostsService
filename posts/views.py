@@ -1,5 +1,6 @@
 from rest_framework import generics, viewsets
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.decorators import action
 
 from .models import Posts
 from .serializers import PostSerializer
@@ -18,6 +19,10 @@ class PostListView(generics.ListCreateAPIView):
 class PostViewSet2(viewsets.ModelViewSet):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
-    parser_classes = (MultiPartParser, FormParser, JSONParser)
-    # parser_classes = [MultiPartParser, FormParser]
+    # parser_classes = (MultiPartParser, FormParser, JSONParser)
+    # parser_classes = (MultiPartParser, FormParser)
 
+    @action(detail=False, methods=['post'])
+    def load_file(self, request):
+        file = request.FILES['file']
+        return file

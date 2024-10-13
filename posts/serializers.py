@@ -13,9 +13,9 @@ from .models import Posts
 
 
 class PostSerializer(serializers.ModelSerializer):
-    videos = VideoSerializers(many=True, required=False)
-    photos = PhotoSerializers(many=True, required=False)
-    documents = DocumentSerializers(many=True, required=False)
+    videos = VideoSerializers(many=False, required=False)
+    photos = PhotoSerializers(many=False, required=False)
+    documents = DocumentSerializers(many=False, required=False)
 
     class Meta:
         model = Posts
@@ -23,18 +23,19 @@ class PostSerializer(serializers.ModelSerializer):
         read_only_fields = ('created_date', 'modified_date')
 
     def create(self, validated_data):
-        videos_data = validated_data.pop('videos', [])
-        photos_data = validated_data.pop('photos', [])
-        documents_data = validated_data.pop('documents', [])
+        videos_data = validated_data.pop('videos', None)
+        photos_data = validated_data.pop('photos', None)
+        documents_data = validated_data.pop('documents', None)
         
         post = Posts.objects.create(**validated_data)
         
         for video_data in videos_data:
-            Video.objects.create(post=post, **video_data)
+            if videos_data[video_data] is not None:
+                Video.objects.create(post=post, **video_data)
         for photo_data in photos_data:
-            Photo.objects.create(post=post, **photo_data)
+            Photo.objects.create(post=post, file = photos_data[photo_data])
         for document_data in documents_data:
-            Document.objects.create(post=post, **document_data)
+            Document.objects.create(post=post, file = documents_data[document_data])
 
         return post
 
