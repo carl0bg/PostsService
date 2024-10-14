@@ -12,9 +12,9 @@ router.register(r'posts', PostViewSet2)
 
 
 urlpatterns = [
-    path('post/<int:pk>/', PostDetailView.as_view(), name = 'one_post'),
-    path('posts/', PostListView.as_view(), name = 'list_post'),
+    # path('post/<int:pk>/', PostDetailView.as_view(), name = 'one_post'),
+    # path('posts/', PostListView.as_view(), name = 'list_post'),
 
 
-    path('v2', include(router.urls)),
+    path('v2/', include(router.urls)),
 ]

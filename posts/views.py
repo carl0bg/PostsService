@@ -5,7 +5,10 @@ from rest_framework.decorators import action
 
 from .models import Posts
 from .serializers import PostSerializer
+
 from photo.serializers import PhotoSerializers
+from document.serializers import DocumentSerializers
+from video.serializers import VideoSerializers
 
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -24,12 +27,23 @@ class PostViewSet2(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        # serializer = self.get_serializer(queryset, many=True)
         serializer = self.serializer_class(queryset, many= True)
         for post in serializer.data:
-            # print(post.photo, post.photo['file'])
-            perem = Posts.objects.get(id = post['id']).photos.all()
-            perem2 = PhotoSerializers(perem, many = True)
-            post['photos'] = perem2.data
+            posts_photos = PhotoSerializers(
+                Posts.objects.get(id = post['id']).photos.all(),
+                many = True
+            )
+            posts_document = DocumentSerializers(
+                Posts.objects.get(id = post['id']).documents.all(),
+                many = True
+            )
+            posts_video = VideoSerializers(
+                Posts.objects.get(id = post['id']).videos.all(),
+                many = True 
+            )
+            post['photos'] = posts_photos.data
+            post['documents'] = posts_document.data
+            post['videos'] = posts_video.data
+        
         return Response(serializer.data)
         

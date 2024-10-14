@@ -15,5 +15,3 @@ class DocumentSerializers(serializers.ModelSerializer):
 
 
 
-
-        
