@@ -2,13 +2,16 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import action
+from rest_framework import status
 
 from .models import Posts
 from .serializers import PostSerializer
 
-from photo.serializers import PhotoSerializers
-from document.serializers import DocumentSerializers
-from video.serializers import VideoSerializers
+# from photo.serializers import PhotoSerializers
+# from document.serializers import DocumentSerializers
+# from video.serializers import VideoSerializers
+
+from .serializers import *
 
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -28,15 +31,15 @@ class PostViewSet2(viewsets.ModelViewSet):
 
     def iteration_pk_posts(self, serial_data):
         for post in serial_data:
-            posts_photos = PhotoSerializers(
+            posts_photos = PhotoSerializers2(
                 Posts.objects.get(id = post['id']).photos.all(),
                 many = True
             )
-            posts_document = DocumentSerializers(
+            posts_document = DocumentSerializers2(
                 Posts.objects.get(id = post['id']).documents.all(),
                 many = True
             )
-            posts_video = VideoSerializers(
+            posts_video = VideoSerializers2(
                 Posts.objects.get(id = post['id']).videos.all(),
                 many = True 
             )
@@ -61,19 +64,26 @@ class PostViewSet2(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
+        print(type(request.data))
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-
-        # if getattr(instance, '_prefetched_objects_cache', None):
-        #     # If 'prefetch_related' has been applied to a queryset, we need to
-        #     # forcibly invalidate the prefetch cache on the instance.
-        #     instance._prefetched_objects_cache = {}
-
+  
         return Response(self.iteration_pk_posts([serializer.data]))
 
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
+    
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # def perform_create(self, serializer):
+    #     serializer.save()
