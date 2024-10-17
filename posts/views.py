@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import action
 from rest_framework import status
+from rest_framework.views import APIView 
 
 from .models import Posts
 from .serializers import PostSerializer
@@ -12,6 +13,37 @@ from .serializers import PostSerializer
 # from video.serializers import VideoSerializers
 
 from .serializers import *
+
+
+
+
+
+class PostsListView3(APIView):
+    """Вывод списка фильмов"""
+    def get(self, request):
+        movies = Posts.objects.all()
+        serializer = PostSerializer3(movies, many=True)
+        return Response(serializer.data)
+
+
+class PostsDetailView3(APIView):
+    """Вывод фильма"""
+    def get(self, request, pk):
+        movie = Posts.objects.get(id=pk)
+        serializer = PostSerializer3(movie)
+        return Response(serializer.data)
+
+
+
+
+class PostViewSet3_sets(viewsets.ModelViewSet):
+    queryset = Posts.objects.all()
+    serializer_class = PostSerializer3
+
+
+
+
+
 
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):

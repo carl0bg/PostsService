@@ -23,6 +23,21 @@ class DocumentSerializers2(serializers.ModelSerializer):
         fields = ('id', 'file', 'post')
 
 
+class PostSerializer3(serializers.ModelSerializer):
+
+    documents = serializers.SlugRelatedField(slug_field="file", queryset = Document.objects.all(), many=True)
+    photos = serializers.SlugRelatedField(slug_field="id", queryset = Photo.objects.all(), many=True)
+    videos = serializers.SlugRelatedField(slug_field="file", queryset = Video.objects.all(), many=True)
+
+    class Meta:
+        model = Posts
+        fields = '__all__'
+
+
+
+
+
+
 class PostSerializer(serializers.ModelSerializer):
     videos = VideoSerializers2(many=True, required=False)
     photos = PhotoSerializers2(many=True, required=False)
