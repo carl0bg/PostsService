@@ -34,6 +34,14 @@ class PostsDetailView3(APIView):
         return Response(serializer.data)
 
 
+class ReviewCreateView3(APIView):
+    """Добавление отзыва к фильму"""
+    def post(self, request):
+        review = PostSerializer3(data=request.data)
+        if review.is_valid():
+            review.save()
+        return Response(status=201)
+    
 
 
 class PostViewSet3_sets(viewsets.ModelViewSet):

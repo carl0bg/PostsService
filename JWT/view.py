@@ -78,9 +78,3 @@ class TokenRefreshView(TokenViewBase):
     def post(self, request: Request, *args, **kwargs) -> Response:
         response = super().post(request, *args, **kwargs)
         return response
-
-        
-
-
-
-

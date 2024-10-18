@@ -21,6 +21,7 @@ urlpatterns = [
     # path('v2/', include(router.urls)),
 
     path('v3/', include(router.urls)),
+    path('v3/ps/', ReviewCreateView3.as_view()),
     # path("v3/posts/", PostsListView3.as_view()),
     # path("v3/posts/<int:pk>/", PostsDetailView3.as_view()),
 
