@@ -25,5 +25,4 @@ urlpatterns = [
     # path("v3/posts/", PostsListView3.as_view()),
     # path("v3/posts/<int:pk>/", PostsDetailView3.as_view()),
 
-
 ]

@@ -6,12 +6,18 @@ from posts.models import Posts
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
 
+from .func_upload import get_path_upload_image
+
+
+
 
 class Photo(models.Model):
     post = models.ForeignKey(
         to = Posts,
         on_delete=models.CASCADE,
-        related_name='photos'
+        related_name='photos',
+        null = True, #TODO
+        blank= True
     )
     
     file = models.ImageField(
@@ -19,6 +25,17 @@ class Photo(models.Model):
         null=True,
         blank=True
     )
+
+
+
+    def save(self, *args, **kwargs):
+        self.file.name = get_path_upload_image(
+            post = self.post,
+            file = self.file.name
+        )
+        super().save(*args, **kwargs)
+
+
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
