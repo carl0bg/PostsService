@@ -4,11 +4,6 @@ from django.utils import timezone
 
 
 
-
-
-
-
-
 def get_path_upload_image(post, file):
     '''
     универсальный путь изображения
