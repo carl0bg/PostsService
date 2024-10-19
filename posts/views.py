@@ -28,7 +28,8 @@ class PostListCreateAPIView(APIView):
     def post(self, request, format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            additional_data = {"photos": request.data['photos']}
+            # additional_data = {"photos": request.data['photos']}
+            additional_data = {"photos": dict((request.data).lists())['photos']}
             serializer.save(**additional_data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

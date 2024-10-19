@@ -12,10 +12,6 @@ class VideoSerializers2(serializers.ModelSerializer):
         model = Video
         fields = ('id', 'file', 'post')
 
-class PhotoSerializers2(serializers.ModelSerializer):
-    class Meta:
-        model = Photo
-        fields = ('id', 'file', 'post')
 
 class DocumentSerializers2(serializers.ModelSerializer):
     class Meta:
@@ -23,14 +19,20 @@ class DocumentSerializers2(serializers.ModelSerializer):
         fields = ('id', 'file', 'post')
 
 
+
+class PhotoSerializers2(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ('id', 'file', 'post')
+
+    def create(self, validated_data):
+        return Photo.objects.create(**validated_data)
+
+
+
 class PostSerializer(serializers.ModelSerializer):
-
-    # documents = serializers.SlugRelatedField(slug_field="file", queryset = Document.objects.all(), many=True)
-    # photos = serializers.SlugRelatedField(slug_field="id", queryset = Photo.objects.all(), many=True)
-    # videos = serializers.SlugRelatedField(slug_field="file", queryset = Video.objects.all(), many=True)
-
     documents = DocumentSerializers2(many = True, required=False)
-    photos = PhotoSerializers2(many = True, required=False)
+    photos = PhotoSerializers2(many = False, required=False)
     videos = VideoSerializers2(many = True, required=False)
 
 
@@ -43,8 +45,13 @@ class PostSerializer(serializers.ModelSerializer):
         photos_data = validated_data.pop('photos', [])
         post = Posts.objects.create(**validated_data)
 
-        # for photo_data in photos_data:
-        Photo.objects.create(post=post, file = photos_data)
+        arr = []
+        if photos_data is not None:
+            for photo_data in photos_data:
+                photo_srl = PhotoSerializers2(data = {'file': photo_data, 'post': post.id})
+                photo_srl.is_valid(raise_exception=True)  # Вызываем валидацию
+                photo_srl.save(post=post)
+                arr.append(photo_srl.data)
 
         return post
 
