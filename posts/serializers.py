@@ -53,7 +53,7 @@ class PostSerializer(serializers.ModelSerializer):
                 photo_srl.save(post=post)
                 arr.append(photo_srl.data)
 
-        return post
+        return (post, arr)
 
 
 
