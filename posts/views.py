@@ -19,54 +19,82 @@ from .serializers import *
 
 
 
-class PostListCreateAPIView(APIView):
-    def get(self, request, format=None):
+class SubViewPkMixin:
+
+    def iteration_pk_posts(self, serial_data):
+        for post in serial_data:
+            posts_photos = PhotoSerializers2(
+                Posts.objects.get(id = post['id']).photos.all(),
+                many = True
+            )
+            posts_document = DocumentSerializers2(
+                Posts.objects.get(id = post['id']).documents.all(),
+                many = True
+            )
+            posts_video = VideoSerializers2(
+                Posts.objects.get(id = post['id']).videos.all(),
+                many = True 
+            )
+            post['photos'] = posts_photos.data
+            post['documents'] = posts_document.data
+            post['videos'] = posts_video.data
+        return serial_data
+    
+
+    def get_list_request_file(self, request):
+        if 'photos' in request.data:
+            return dict((request.data).lists())['photos']
+        else:
+            return None
+
+
+
+class PostListCreateAPIView(APIView, SubViewPkMixin):
+       
+    def get(self, request):
         posts = Posts.objects.all()
         serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        return Response(self.iteration_pk_posts(serializer.data))
     
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            # additional_data = {"photos": request.data['photos']}
-            additional_data = {"photos": dict((request.data).lists())['photos']}
-            post, arr = serializer.save(**additional_data)
-            # return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({ #TODO
-                'post': post,
-                'photo': arr
-                },
-                status=status.HTTP_201_CREATED
-            )
+            additional_data = {"photos": self.get_list_request_file(request)}
+            serializer.save(**additional_data)
+            return Response(self.iteration_pk_posts([serializer.data]), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
-class PostDetailAPIView(APIView):
+
+class PostDetailAPIView(APIView, SubViewPkMixin):
     def get_object(self, pk):
         try:
             return Posts.objects.get(pk=pk)
         except Posts.DoesNotExist:
             return None
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         post = self.get_object(pk)
         if post is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = PostSerializer(post)
-        return Response(serializer.data)
+        return Response(self.iteration_pk_posts([serializer.data]))
 
-    def put(self, request, pk, format=None):
+
+    def put(self, request, pk):
         post = self.get_object(pk)
         if post is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            additional_data = {"photos": self.get_list_request_file(request)}
+            serializer.save(**additional_data)
+            return Response(self.iteration_pk_posts([serializer.data]))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+
+    def delete(self, request, pk):
         post = self.get_object(pk)
         if post is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)

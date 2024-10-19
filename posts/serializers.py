@@ -53,10 +53,29 @@ class PostSerializer(serializers.ModelSerializer):
                 photo_srl.save(post=post)
                 arr.append(photo_srl.data)
 
-        return (post, arr)
+        return post
 
 
 
+    def update(self, instance, validated_data):
+        photos_data = validated_data.pop('photos', None)
+
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+
+        instance.photos.all().delete() 
+        if photos_data is not None:
+            arr = []
+            for photo_data in photos_data:
+                photo_srl = PhotoSerializers2(data={'file': photo_data, 'post': instance.id})
+                photo_srl.is_valid(raise_exception=True)  
+                photo_srl.save(post=instance)  
+                arr.append(photo_srl.data)
+
+        return instance
 
 
 
