@@ -14,7 +14,6 @@ class PhotoDetailView(generics.RetrieveDestroyAPIView):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializers
 
-    # parser_classes = [MultiPartParser, FormParser]
 
 
 
@@ -50,24 +49,27 @@ class ImageView(APIView):
         serializer = PhotoSerializers(all_images, many=True)
         return JsonResponse(serializer.data, safe=False)
 
+
+    def modify_input_for_multiple_files(post, image):
+        dict = {}
+        dict['post'] = post
+        dict['file'] = image
+        return dict
+
+
     def post(self, request, *args, **kwargs):
         post = request.data['post']
 
-        # converts querydict to original dict
         images = dict((request.data).lists())['file']
-        flag = 1
         arr = []
-        for img_name in images:
-            modified_data = modify_input_for_multiple_files(post,
-                                                            img_name)
-            file_serializer = PhotoSerializers(data=modified_data)
-            if file_serializer.is_valid():
-                file_serializer.save()
-                arr.append(file_serializer.data)
-            else:
-                flag = 0
+        try:
+            for img_name in images:
+                modified_data = modify_input_for_multiple_files(post, img_name)
+                file_serializer = PhotoSerializers(data=modified_data)
+                if file_serializer.is_valid():
+                    file_serializer.save()
+                    arr.append(file_serializer.data)
 
-        if flag == 1:
             return Response(arr, status=status.HTTP_201_CREATED)
-        else:
+        except Exception as e:
             return Response(arr, status=status.HTTP_400_BAD_REQUEST)
