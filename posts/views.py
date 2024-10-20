@@ -88,10 +88,23 @@ class PostDetailAPIView(APIView, SubViewPkMixin):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid():
-            additional_data = {"photos": self.get_list_request_file(request)}
+            additional_data = {"photos": self.get_list_request_file(request), 'method': request.method}
             serializer.save(**additional_data)
             return Response(self.iteration_pk_posts([serializer.data]))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def patch(self, request, pk):
+        post = self.get_object(pk)
+        if post is None:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            additional_data = {"photos": self.get_list_request_file(request), 'method': request.method}
+            serializer.save(**additional_data)
+            return Response(self.iteration_pk_posts([serializer.data]))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
     def delete(self, request, pk):

@@ -45,8 +45,8 @@ class PostSerializer(serializers.ModelSerializer):
         photos_data = validated_data.pop('photos', [])
         post = Posts.objects.create(**validated_data)
 
-        arr = []
         if photos_data is not None:
+            arr = []
             for photo_data in photos_data:
                 photo_srl = PhotoSerializers2(data = {'file': photo_data, 'post': post.id})
                 photo_srl.is_valid(raise_exception=True)  # Вызываем валидацию
@@ -60,22 +60,57 @@ class PostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         photos_data = validated_data.pop('photos', None)
 
+        if validated_data['method'] == "PUT":
+            super().update(instance, validated_data)
+            instance.photos.all().delete() 
+            if photos_data is not None:
+                arr = []
+                for photo_data in photos_data:
+                    photo_srl = PhotoSerializers2(data={'file': photo_data, 'post': instance.id})
+                    photo_srl.is_valid(raise_exception=True)  
+                    photo_srl.save(post=instance)  
+                    arr.append(photo_srl.data)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-
-        instance.photos.all().delete() 
-        if photos_data is not None:
-            arr = []
-            for photo_data in photos_data:
-                photo_srl = PhotoSerializers2(data={'file': photo_data, 'post': instance.id})
-                photo_srl.is_valid(raise_exception=True)  
-                photo_srl.save(post=instance)  
-                arr.append(photo_srl.data)
+        else:
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            if photos_data is not None:
+                instance.photos.all().delete() 
+                arr = []
+                for photo_data in photos_data:
+                    photo_srl = PhotoSerializers2(data={'file': photo_data, 'post': instance.id})
+                    photo_srl.is_valid(raise_exception=True)  
+                    photo_srl.save(post=instance)  
+                    arr.append(photo_srl.data)
 
         return instance
+    
+    # def update(self, instance, validated_data):
+    #     raise_errors_on_nested_writes('update', self, validated_data)
+    #     info = model_meta.get_field_info(instance)
+
+    #     # Simply set each attribute on the instance, and then save it.
+    #     # Note that unlike `.create()` we don't need to treat many-to-many
+    #     # relationships as being a special case. During updates we already
+    #     # have an instance pk for the relationships to be associated with.
+    #     m2m_fields = []
+    #     for attr, value in validated_data.items():
+    #         if attr in info.relations and info.relations[attr].to_many:
+    #             m2m_fields.append((attr, value))
+    #         else:
+    #             setattr(instance, attr, value)
+
+    #     instance.save()
+
+    #     # Note that many-to-many fields are set after updating instance.
+    #     # Setting m2m fields triggers signals which could potentially change
+    #     # updated instance and we do not want it to collide with .update()
+    #     for attr, value in m2m_fields:
+    #         field = getattr(instance, attr)
+    #         field.set(value)
+
+    #     return instance
 
 
 
