@@ -42,10 +42,13 @@ class SubViewPkMixin:
     
 
     def get_list_request_file(self, request):
-        if 'photos' in request.data:
-            return dict((request.data).lists())['photos']
-        else:
-            return None
+        req_data = dict(request.data.lists())
+        file_dict = {}
+        file_dict['photos'] = req_data.get('photos', None)
+        file_dict['documents'] = req_data.get('documents', None)
+        file_dict['videos'] = req_data.get('videos', None)
+
+        return file_dict
 
     
     def serializer_sub_begin(self, request, post = None):
@@ -54,7 +57,7 @@ class SubViewPkMixin:
         else:
             serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid():
-            additional_data = {"photos": self.get_list_request_file(request)}
+            additional_data = self.get_list_request_file(request)
             if request.method != 'POST':
                 additional_data['method'] = request.method
             serializer.save(**additional_data)
