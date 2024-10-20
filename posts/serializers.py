@@ -2,38 +2,18 @@ from rest_framework import serializers
 
 from .models import Posts
 
-from video.models import Video
-from photo.models import Photo
-from document.models import Document
+from video.serializers import VideoSerializers
+from document.serializers import DocumentSerializers
+from photo.serializers import PhotoSerializers
 
 
-class VideoSerializers2(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields = ('id', 'file', 'post')
-
-
-class DocumentSerializers2(serializers.ModelSerializer):
-    class Meta:
-        model = Document
-        fields = ('id', 'file', 'post')
-
-
-
-class PhotoSerializers2(serializers.ModelSerializer):
-    class Meta:
-        model = Photo
-        fields = ('id', 'file', 'post')
-
-    def create(self, validated_data):
-        return Photo.objects.create(**validated_data)
 
 
 
 class PostSerializer(serializers.ModelSerializer):
-    documents = DocumentSerializers2(many = True, required=False)
-    photos = PhotoSerializers2(many = True, required=False)
-    videos = VideoSerializers2(many = True, required=False)
+    documents = DocumentSerializers(many = True, required=False)
+    photos = PhotoSerializers(many = True, required=False)
+    videos = VideoSerializers(many = True, required=False)
 
 
     class Meta:
@@ -57,13 +37,13 @@ class PostSerializer(serializers.ModelSerializer):
         post = super().create(validated_data)
 
         if photos_data is not None:
-            self.data_pars_sub(photos_data, post, PhotoSerializers2)
+            self.data_pars_sub(photos_data, post, PhotoSerializers)
 
         if documents_data is not None:
-            self.data_pars_sub(documents_data, post, DocumentSerializers2)
+            self.data_pars_sub(documents_data, post, DocumentSerializers)
 
         if videos_data is not None:
-            self.data_pars_sub(videos_data, post, VideoSerializers2)
+            self.data_pars_sub(videos_data, post, VideoSerializers)
 
         return post
 
@@ -80,26 +60,26 @@ class PostSerializer(serializers.ModelSerializer):
             post.videos.all().delete() 
 
             if photos_data is not None:
-                self.data_pars_sub(photos_data, post, PhotoSerializers2)
+                self.data_pars_sub(photos_data, post, PhotoSerializers)
 
             if documents_data is not None:
-                self.data_pars_sub(documents_data, post, DocumentSerializers2)
+                self.data_pars_sub(documents_data, post, DocumentSerializers)
 
             if videos_data is not None:
-                self.data_pars_sub(videos_data, post, VideoSerializers2)
+                self.data_pars_sub(videos_data, post, VideoSerializers)
         else: #PATCH
             for attr, value in validated_data.items():
                 setattr(post, attr, value)
             post.save()
             if photos_data is not None:
                 post.photos.all().delete() 
-                self.data_pars_sub(photos_data, post, PhotoSerializers2)
+                self.data_pars_sub(photos_data, post, PhotoSerializers)
             if documents_data is not None:
                 post.documents.all().delete() 
-                self.data_pars_sub(documents_data, post, DocumentSerializers2)
+                self.data_pars_sub(documents_data, post, DocumentSerializers)
             if videos_data is not None:
                 post.videos.all().delete() 
-                self.data_pars_sub(videos_data, post, VideoSerializers2)
+                self.data_pars_sub(videos_data, post, VideoSerializers)
 
 
         return post

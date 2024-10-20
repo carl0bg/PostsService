@@ -1,16 +1,15 @@
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
+from rest_framework.decorators import action, parser_classes
 from rest_framework import status
 from rest_framework.views import APIView 
 
+from drf_yasg.utils import swagger_auto_schema
+
+
 from .models import Posts
 from .serializers import PostSerializer
-
-# from photo.serializers import PhotoSerializers
-# from document.serializers import DocumentSerializers
-# from video.serializers import VideoSerializers
 
 from .serializers import *
 
@@ -23,15 +22,15 @@ class SubViewPkMixin:
 
     def iteration_pk_posts(self, serial_data):
         for post in serial_data:
-            posts_photos = PhotoSerializers2(
+            posts_photos = PhotoSerializers(
                 Posts.objects.get(id = post['id']).photos.all(),
                 many = True
             )
-            posts_document = DocumentSerializers2(
+            posts_document = DocumentSerializers(
                 Posts.objects.get(id = post['id']).documents.all(),
                 many = True
             )
-            posts_video = VideoSerializers2(
+            posts_video = VideoSerializers(
                 Posts.objects.get(id = post['id']).videos.all(),
                 many = True 
             )
@@ -69,12 +68,18 @@ class SubViewPkMixin:
 
 
 class PostListCreateAPIView(APIView, SubViewPkMixin):
-       
+
     def get(self, request):
         posts = Posts.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(self.iteration_pk_posts(serializer.data))
     
+
+    @swagger_auto_schema(
+        operation_description="Создание поста",
+        request_body=PostSerializer,
+        responses={201: PostSerializer(many=False)}
+    )
     def post(self, request):
         if serializer := self.serializer_sub_begin(request):
             return Response(self.iteration_pk_posts([serializer.data]), status=status.HTTP_201_CREATED)
@@ -97,6 +102,11 @@ class PostDetailAPIView(APIView, SubViewPkMixin):
         return Response(self.iteration_pk_posts([serializer.data]))
 
 
+
+    @swagger_auto_schema(
+        operation_description="Put Post",
+        request_body=PostSerializer,
+    )
     def put(self, request, pk):
         if (post:=self.get_object(pk)) is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
@@ -105,7 +115,10 @@ class PostDetailAPIView(APIView, SubViewPkMixin):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+    @swagger_auto_schema(
+        operation_description="Patch Post",
+        request_body=PostSerializer,
+    )
     def patch(self, request, pk):
         if (post:=self.get_object(pk)) is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)

@@ -6,10 +6,6 @@ from .models import Video
 
         
 class VideoSerializers(serializers.ModelSerializer):
-
-    # file = serializers.FileField()
-
     class Meta:
         model = Video
-        fields= ('id', 'file')
-        
+        fields = ('id', 'file', 'post')
