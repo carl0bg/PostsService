@@ -43,7 +43,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         photos_data = validated_data.pop('photos', [])
-        post = Posts.objects.create(**validated_data)
+        
+        # post = Posts.objects.create(**validated_data)
+
+        post = super().create(validated_data = validated_data)
 
         if photos_data is not None:
             arr = []
