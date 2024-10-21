@@ -45,19 +45,9 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-# class LogoutSerializer(serializers.ModelSerializer):
-
-#     def create(self, validated_data):
-#         return BlacklistedToken.objects.create_user(**validated_data)
-
-
-#     class Meta:
-#         model = BlacklistedToken
-
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
-    # access = serializers.CharField(read_only=True)
     token_class = BlacklistedToken
 
     def validate(self, attrs):

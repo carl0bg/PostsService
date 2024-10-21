@@ -1,7 +1,7 @@
 import boto3
 
 from django.db import models
-
+from TestUser.models import User
 
 class Posts(models.Model):
 
@@ -30,12 +30,18 @@ class Posts(models.Model):
         verbose_name='Текст поста',
         blank=True
     )
-
+    
+    user = models.ForeignKey(
+        to = User,
+        on_delete=models.CASCADE,
+        related_name = 'post_user',
+        blank=False,
+        null=False,
+    )
 
     class Meta:
         db_table = 'posts'
 
-    # def __str__(self):
-    #     return f'Post {self.id}'
+
 
 
