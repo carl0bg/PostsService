@@ -1,7 +1,8 @@
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
-from rest_framework.decorators import action, parser_classes
+from rest_framework.decorators import action, parser_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework.views import APIView 
 
@@ -52,22 +53,27 @@ class SubViewPkMixin:
     
     def serializer_sub_begin(self, request, post = None):
         if post is None:
-            serializer = PostSerializer(data=request.data)
+            serializer = PostSerializer(data=request.data, context={'request': request})
         else:
             serializer = PostSerializer(post, data=request.data)
+        # serializer.user = request.user
         if serializer.is_valid():
             additional_data = self.get_list_request_file(request)
+            additional_data['user'] = request.user
             if request.method != 'POST':
                 additional_data['method'] = request.method
             serializer.save(**additional_data)
-            return serializer
+            return serializer, True
         else:
-            return False
+            return serializer, False
 
 
 
 
 class PostListCreateAPIView(APIView, SubViewPkMixin):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
 
     def get(self, request):
         posts = Posts.objects.all()
@@ -81,7 +87,8 @@ class PostListCreateAPIView(APIView, SubViewPkMixin):
         responses={201: PostSerializer(many=False)}
     )
     def post(self, request):
-        if serializer := self.serializer_sub_begin(request):
+        serializer, flag_valid = self.serializer_sub_begin(request)
+        if flag_valid:
             return Response(self.iteration_pk_posts([serializer.data]), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -89,6 +96,9 @@ class PostListCreateAPIView(APIView, SubViewPkMixin):
 
 
 class PostDetailAPIView(APIView, SubViewPkMixin):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get_object(self, pk):
         try:
             return Posts.objects.get(pk=pk)
@@ -110,7 +120,9 @@ class PostDetailAPIView(APIView, SubViewPkMixin):
     def put(self, request, pk):
         if (post:=self.get_object(pk)) is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if serializer := self.serializer_sub_begin(request, post):
+
+        serializer, flag_valid = self.serializer_sub_begin(request, post)
+        if flag_valid:
             return Response(self.iteration_pk_posts([serializer.data]))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -122,7 +134,9 @@ class PostDetailAPIView(APIView, SubViewPkMixin):
     def patch(self, request, pk):
         if (post:=self.get_object(pk)) is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if serializer := self.serializer_sub_begin(request, post):
+
+        serializer, flag_valid = self.serializer_sub_begin(request, post)
+        if flag_valid:
             return Response(self.iteration_pk_posts([serializer.data]))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

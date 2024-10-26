@@ -35,8 +35,8 @@ class Posts(models.Model):
         to = User,
         on_delete=models.CASCADE,
         related_name = 'post_user',
-        blank=False,
-        null=False,
+        # blank=True,
+        # null=False,
     )
 
     class Meta:

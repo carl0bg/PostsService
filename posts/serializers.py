@@ -19,6 +19,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Posts
         fields = '__all__'
+        # exclude = ['users']
 
 
     def data_pars_sub(self, data_list, post, serializ):
@@ -33,6 +34,7 @@ class PostSerializer(serializers.ModelSerializer):
         photos_data = validated_data.pop('photos', None)
         documents_data = validated_data.pop('documents', None)
         videos_data = validated_data.pop('videos', None)
+        
 
         post = super().create(validated_data)
 

@@ -51,7 +51,6 @@ class JWTAuthentication(authentication.BaseAuthentication):
         header = request.META.get('HTTP_AUTHORIZATION')
 
         if isinstance(header, str):
-            # Work around django test client oddness
             header = header.encode()
 
         return header
