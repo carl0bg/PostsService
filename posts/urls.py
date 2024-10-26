@@ -28,12 +28,16 @@ app_name = 'posts_api'
 # ]
 
 
-router = DefaultRouter()
-router.register(r'posts', PostListCreateAPIView, basename='post')
+# router = DefaultRouter()
+# router.register(r'posts', PostListCreateAPIView, basename='post')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    # path('', include(router.urls)),
 
-    # path('', PostListCreateAPIView.as_view(), name='post-list-create'),
+    path('posts', PostListAPIView.as_view(), name='post_list'),
+    path('posts/<int:pk>', PostGetOneAPIView.as_view(), name='post_get_one'),
+    path('posts/create', PostCreateAPIView.as_view(), name='post_create'),
+
+
     # path('posts/<int:pk>/', PostDetailAPIView.as_view(), name='post-detail'),
 ]

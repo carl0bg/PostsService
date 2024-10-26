@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Posts
+from .database import create_post
 
 from video.serializers import VideoSerializers
 from document.serializers import DocumentSerializers
@@ -94,6 +95,16 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Posts
-        # fields = '__all__'
         fields = ['id', 'documents', 'photos', 'videos', 'chat', 'text', 'user']
-        # exclude = ['users']
+        
+    def create(self, validated_data):
+        photos_data = validated_data.pop('photos', None)
+        documents_data = validated_data.pop('documents', None)
+        videos_data = validated_data.pop('videos', None)
+        
+
+        post = create_post(validated_data, photos_data, videos_data, documents_data)
+
+        return post
+
+        
