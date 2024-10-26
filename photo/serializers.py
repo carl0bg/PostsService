@@ -8,5 +8,5 @@ class PhotoSerializers(serializers.ModelSerializer):
         model = Photo
         fields = ('id', 'file', 'post')
 
-    def create(self, validated_data):
-        return Photo.objects.create(**validated_data)
+    # def create(self, validated_data):
+    #     return Photo.objects.create(**validated_data)

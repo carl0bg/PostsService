@@ -27,7 +27,13 @@ app_name = 'posts_api'
 
 # ]
 
+
+router = DefaultRouter()
+router.register(r'posts', PostListCreateAPIView, basename='post')
+
 urlpatterns = [
-    path('posts/', PostListCreateAPIView.as_view(), name='post-list-create'),
-    path('posts/<int:pk>/', PostDetailAPIView.as_view(), name='post-detail'),
+    path('', include(router.urls)),
+
+    # path('', PostListCreateAPIView.as_view(), name='post-list-create'),
+    # path('posts/<int:pk>/', PostDetailAPIView.as_view(), name='post-detail'),
 ]
