@@ -12,8 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from .models import Posts
 from .serializers import PostSerializer
-
-from .serializers import *
+from .permissions import IsOnlyOwner, IsOwnerOrReadOnly
 
 
 
@@ -61,6 +60,7 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     '''GET, PUT, PATCH отдельного элемента Post'''
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
     @swagger_auto_schema(
         operation_description="Put Post",
@@ -97,6 +97,7 @@ class PostCreateAPIView(generics.CreateAPIView, SubViewPkMixin):
     '''Создать объект'''
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
     def serializer_sub_begin(self, request, post = None):
         if post is None:
@@ -126,7 +127,9 @@ class PostCreateAPIView(generics.CreateAPIView, SubViewPkMixin):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class PostDeleteView(generics.DestroyAPIView):
     '''удаление post'''
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsOnlyOwner]

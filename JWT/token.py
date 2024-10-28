@@ -187,7 +187,7 @@ class Token:
 
 class AccessToken(Token):
     token_type = "access"
-    lifetime = timedelta(minutes=5)
+    lifetime = timedelta(minutes=20) #TODO время установлено во время разработки
 
 
 
