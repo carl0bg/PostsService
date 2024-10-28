@@ -102,9 +102,7 @@ class PostSerializer(serializers.ModelSerializer):
         documents_data = validated_data.pop('documents', None)
         videos_data = validated_data.pop('videos', None)
         
-
+        
         post = create_post(validated_data, photos_data, videos_data, documents_data)
 
         return post
-
-        

@@ -6,7 +6,7 @@ from posts.models import Posts
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
 
-from .func_upload import get_path_upload_image
+from posts.func_upload import get_path_upload_format
 
 
 
@@ -29,7 +29,7 @@ class Photo(models.Model):
 
 
     def save(self, *args, **kwargs):
-        self.file.name = get_path_upload_image(
+        self.file.name = get_path_upload_format(
             post = self.post,
             file = self.file.name
         )

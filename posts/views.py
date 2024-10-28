@@ -23,24 +23,24 @@ from .serializers import *
 
 class SubViewPkMixin:
 
-    def iteration_pk_posts(self, serial_data):
-        for post in serial_data:
-            posts_photos = PhotoSerializers(
-                Posts.objects.get(id = post['id']).photos.all(),
-                many = True
-            )
-            posts_document = DocumentSerializers(
-                Posts.objects.get(id = post['id']).documents.all(),
-                many = True
-            )
-            posts_video = VideoSerializers(
-                Posts.objects.get(id = post['id']).videos.all(),
-                many = True 
-            )
-            post['photos'] = posts_photos.data
-            post['documents'] = posts_document.data
-            post['videos'] = posts_video.data
-        return serial_data
+    # def iteration_pk_posts(self, serial_data):
+    #     for post in serial_data:
+    #         posts_photos = PhotoSerializers(
+    #             Posts.objects.get(id = post['id']).photos.all(),
+    #             many = True
+    #         )
+    #         posts_document = DocumentSerializers(
+    #             Posts.objects.get(id = post['id']).documents.all(),
+    #             many = True
+    #         )
+    #         posts_video = VideoSerializers(
+    #             Posts.objects.get(id = post['id']).videos.all(),
+    #             many = True 
+    #         )
+    #         post['photos'] = posts_photos.data
+    #         post['documents'] = posts_document.data
+    #         post['videos'] = posts_video.data
+    #     return serial_data
     
 
     def get_list_request_file(self, request):
@@ -186,7 +186,7 @@ class PostListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
 
 
-class PostGetOneAPIView(generics.RetrieveAPIView):
+class PostGetOneAPIView(generics.RetrieveUpdateAPIView):
     '''Получить отдельный элемент Post'''
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
