@@ -6,16 +6,19 @@ from .database import create_post, orm_put_post, orm_patch_post
 from video.serializers import VideoSerializers
 from document.serializers import DocumentSerializers
 from photo.serializers import PhotoSerializers
+from TestUser.serializers import UserSerializer
 
 
 class PostSerializer(serializers.ModelSerializer):
     documents = DocumentSerializers(many = True, required=False)
     photos = PhotoSerializers(many = True, required=False)
     videos = VideoSerializers(many = True, required=False)
+    user = UserSerializer(read_only = True)
 
     class Meta:
         model = Posts
         fields = ['id', 'documents', 'photos', 'videos', 'chat', 'text', 'user']
+        read_only_fields = ['user']
         
     def create(self, validated_data):
         photos_data = validated_data.pop('photos', None)

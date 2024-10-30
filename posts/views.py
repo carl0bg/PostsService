@@ -4,7 +4,6 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, File
 from rest_framework.decorators import action, parser_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework import status
-from rest_framework.views import APIView 
 from rest_framework import generics, mixins
 
 from drf_yasg.utils import swagger_auto_schema
@@ -36,10 +35,10 @@ class SubViewPkMixin:
             serializer = PostSerializer(data=request.data, context={'request': request})
         else:
             serializer = PostSerializer(post, data=request.data)
-        # serializer.user = request.user
+        serializer.user = request.user
         if serializer.is_valid():
             additional_data = self.get_list_request_file(request)
-            # additional_data['user'] = request.user
+            additional_data['user'] = request.user
             if request.method != 'POST':
                 additional_data['method'] = request.method
             serializer.save(**additional_data)
@@ -98,22 +97,6 @@ class PostCreateAPIView(generics.CreateAPIView, SubViewPkMixin):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
-
-    def serializer_sub_begin(self, request, post = None):
-        if post is None:
-            serializer = PostSerializer(data=request.data, context={'request': request})
-        else:
-            serializer = PostSerializer(post, data=request.data)
-        # serializer.user = request.user
-        if serializer.is_valid():
-            additional_data = self.get_list_request_file(request)
-            # additional_data['user'] = request.user
-            if request.method != 'POST':
-                additional_data['method'] = request.method
-            serializer.save(**additional_data)
-            return serializer, True
-        else:
-            return serializer, False
 
     @swagger_auto_schema(
         operation_description="Создание поста",

@@ -57,4 +57,7 @@ class LogoutSerializer(serializers.Serializer):
         self.token_class.objects.create()
 
 
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username'] 
