@@ -53,6 +53,14 @@ class PostListAPIView(generics.ListAPIView):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
     
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related('user')  # Пример для ForeignKey к пользователю
+            .prefetch_related('documents', 'photos', 'videos')
+        )
+
 
 
 class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
