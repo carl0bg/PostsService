@@ -7,10 +7,11 @@ app_name = 'auth'
 
 
 urlpatterns = [
-    # path('user/v1/register/', RegistrationAPIView.as_view()),
-    # path('user/v1/login/', LoginAPIView.as_view()),
-
     path('user/v2/register/', RegistrationAPIView2.as_view()),
     path('user/v2/login/', LoginAPIView2.as_view()),
     path('user/v2/logout/', LogoutAPIView.as_view()),
+
+    path('user/profile/<int:pk>', UserNetView.as_view({'get': 'retrieve', 'put': 'update'})),
+    path('user/<int:pk>', UserNetPublicView.as_view({'get': 'retrieve'})),
+
 ]

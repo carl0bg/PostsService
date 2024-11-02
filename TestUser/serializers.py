@@ -61,3 +61,18 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username'] 
+
+
+
+class GetUserNetSerializers(serializers.ModelSerializer):
+    '''Вывод информации о пользователи'''
+    class Meta:
+        model = User 
+        fields = '__all__'
+
+
+class GetUserPublicNetSerializers(serializers.ModelSerializer):
+    '''Вывод информации для публичных'''
+    class Meta:
+        model = User 
+        exclude = ('password', 'last_login', 'is_superuser', 'is_active', 'is_staff', 'github', 'groups', 'user_permissions')

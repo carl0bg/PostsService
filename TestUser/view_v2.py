@@ -1,9 +1,11 @@
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import permission_classes
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView
+from rest_framework import viewsets
 
 
 
@@ -13,7 +15,7 @@ from drf_yasg import openapi
 from JWT.view import TokenObtainPairView
 from JWT.token import RefreshToken
 
-from .serializers import LoginSerializer, RegistrationSerializer, LogoutSerializer
+from .serializers import GetUserPublicNetSerializers, LoginSerializer, RegistrationSerializer, LogoutSerializer, GetUserNetSerializers
 from .user_renderer import UserJSONRenderer
 from .models import User
 
@@ -74,8 +76,8 @@ class LogoutAPIView(APIView):
     """
     Эндпоинт для разлогинивания пользователя
     """
-    permission_classes = (AllowAny,)
-    parser_classes = [JSONParser]
+    permission_classes = (AllowAny,) #TODO
+    parser_classes = [JSONParser] 
     serializer_class = LogoutSerializer
     
 
@@ -93,3 +95,36 @@ class LogoutAPIView(APIView):
 
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class GetUserNetView(RetrieveAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = GetUserNetSerializers
+    
+
+# class UpdateUserProfile(UpdateAPIView):
+#     serializer_class = GetUserNetSerializers
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         return User.objects.filter(id = self.request.user.id)
+
+class UserNetPublicView(viewsets.ModelViewSet):
+    '''Вывод публично профиля'''
+    queryset = User.objects.all()
+    serializer_class = GetUserPublicNetSerializers
+    permission_classes = [AllowAny]
+    
+
+
+
+
+
+class UserNetView(viewsets.ModelViewSet):
+    '''Вывод профиля для пользователя'''
+    serializer_class = GetUserNetSerializers
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id = self.request.user.id)
+

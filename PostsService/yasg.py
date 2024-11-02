@@ -6,10 +6,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Django API",
+      title="PostService",
       default_version='v1',
-      description="Test description",
-      license=openapi.License(name="BSD License"),
+      description="Docs",
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
