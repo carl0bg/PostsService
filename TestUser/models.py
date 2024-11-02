@@ -50,6 +50,12 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):    
 
+    Gender = (
+        ('male', 'male'),
+        ('female', 'female')
+
+    )
+
     username = models.TextField(
         verbose_name='имя',
         blank=True,
@@ -64,10 +70,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False
     )
 
+    bio = models.TextField(
+        blank= True,
+        null = True
+    )
+
+    github = models.CharField(
+        max_length= 500,
+        blank= True,
+        null= True,
+    )
+
+    birthday = models.DateField(
+        blank= True,
+        null = True
+    )
+
+    gender = models.CharField(max_length= 6, choices=Gender)
+
+
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    # REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.username
