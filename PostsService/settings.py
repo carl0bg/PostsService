@@ -33,6 +33,7 @@ DJANGO_BASE_APPS = [
     'drf_yasg',
     'rest_framework',
     'django_filters',
+    'mptt'
 ]
 
 
@@ -42,7 +43,8 @@ PROJECT_APPS = [
     'video',
     'document',
     'TestUser',
-    'JWT'
+    'JWT',
+    'comments'
 ]
 
 INSTALLED_APPS = DJANGO_BASE_APPS + PROJECT_APPS

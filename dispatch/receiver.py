@@ -13,7 +13,6 @@ from posts.storage import PhotoStorage, DocumentStorage, VideoStorage, delete_ty
 @receiver(post_delete, sender=Video)
 @receiver(post_delete, sender=Document)
 def delete_all_type_from_s3(instance, **kwargs):
-    print('hellllo')
     if isinstance(instance, Photo):
         bucket_name = PhotoStorage().bucket_name
     elif isinstance(instance, Video):
