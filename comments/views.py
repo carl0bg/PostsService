@@ -3,7 +3,7 @@ from rest_framework import permissions, generics
 from .base.classes import CreateUpdateDestroy, CreateRetrieveUpdateDestroy
 from .base.permissions import IsAuthor
 from .models import Posts, Comment
-from .serializers import (PostSerializer, ListPostSerializer, CreateCommentSerializers)
+from .serializers import (PostSerializer2, ListPostSerializer, CreateCommentSerializers)
 
 
 class PostListView(generics.ListAPIView):
@@ -21,23 +21,27 @@ class PostView(CreateRetrieveUpdateDestroy):
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Posts.objects.all().select_related('user').prefetch_related('comments')
-    serializer_class = PostSerializer
-    permission_classes_by_action = {'get': [permissions.AllowAny],
-                                    'update': [IsAuthor],
-                                    'destroy': [IsAuthor]}
+    serializer_class = PostSerializer2
+    permission_classes_by_action = {
+        'get': [permissions.AllowAny],
+        'update': [IsAuthor],
+        'destroy': [IsAuthor]
+        }
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
 class CommentsView(CreateUpdateDestroy):
-    """ CRUD комментариев к запси
+    """ CRUD комментариев 
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
     serializer_class = CreateCommentSerializers
-    permission_classes_by_action = {'update': [IsAuthor],
-                                    'destroy': [IsAuthor]}
+    permission_classes_by_action = {
+        'update': [IsAuthor],
+        'destroy': [IsAuthor]
+        }
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

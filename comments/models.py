@@ -9,7 +9,7 @@ class AbstractComment(models.Model):
     '''Абстрактная модель для комментариев'''
     text = models.TextField(max_length=500)
     created_data = models.DateTimeField(auto_now_add=True)
-    update_data = models.DateTimeField(auto_created=True)
+    update_data = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=True)
     deleted = models.BooleanField(default=False)
 
@@ -18,6 +18,7 @@ class AbstractComment(models.Model):
 
     class Meta:
         abstract = True
+
 
 
 class Comment(AbstractComment, MPTTModel):
@@ -34,3 +35,4 @@ class Comment(AbstractComment, MPTTModel):
 
     def __str__(self):
         return f'{self.user} - {self.post}'
+    

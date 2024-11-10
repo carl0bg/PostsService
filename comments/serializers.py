@@ -26,10 +26,12 @@ class ListCommentSerializer(serializers.ModelSerializer):
     class Meta:
         list_serializer_class = FilterCommentListSerializer
         model = Comment
-        fields = ("id", "post", "user", "text", "created_date", "update_date", "deleted", "children")
+        fields = ("id", "post", "user", "text", "created_data", "update_data", "deleted", "children")
+
+
     
 
-class PostSerializer(serializers.ModelSerializer):
+class PostSerializer2(serializers.ModelSerializer):
     '''Вывод поста'''  
     user = serializers.ReadOnlyField(source = 'user.username')
     comments = ListCommentSerializer(many = True, read_only = True)
@@ -37,7 +39,9 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Posts
-        fields = ("id", "created_date", "user", "text", "comments", "view_count")
+        # fields = ("id", "created_date", "user", "text", "comments", "view_count")
+        fields = "__all__"
+
 
 
 class ListPostSerializer(serializers.ModelSerializer):
@@ -46,4 +50,6 @@ class ListPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Posts
-        fields = ("id", "create_date", "user", "text", "comments_count")
+        # fields = "__all__"
+
+        fields = ("id", "created_date", "user", "text", "comments_count")
