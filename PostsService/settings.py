@@ -44,7 +44,8 @@ PROJECT_APPS = [
     'document',
     'TestUser',
     'JWT',
-    'comments'
+    'comments',
+    'followers'
 ]
 
 INSTALLED_APPS = DJANGO_BASE_APPS + PROJECT_APPS

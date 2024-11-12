@@ -16,6 +16,7 @@ urlpatterns = [
     path('token_api/', include('JWT.urls', namespace='token_api')),
 
     path('wall/', include('comments.urls')),
+    path('followers/', include('followers.urls')),
 ]
 
 urlpatterns += swagger_url
