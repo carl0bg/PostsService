@@ -27,20 +27,17 @@ from TestUser.models import User
 #     def get_queryset(self):
 #         return Follower.objects.filter(user=self.request.user)
 
-class FollowerFilter(FilterSet):
-    class Meta:
-        model = Follower  # Ваша модель Follower
-        fields = ['user']  # Поле, по которому будет фильтроваться
+# class FollowerFilter(FilterSet):
+#     class Meta:
+#         model = Follower  # Ваша модель Follower
+#         fields = ['user']  # Поле, по которому будет фильтроваться
 
 
 class ListFollowerView(generics.ListAPIView):
-    """ Вывод списка подписчиков пользователя
+    """ Вывод списка своих подписчиков
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ListFollowerSerializer
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_class = FollowerFilter
-
 
     def get_queryset(self):
         return Follower.objects.filter(user=self.request.user)
@@ -48,20 +45,25 @@ class ListFollowerView(generics.ListAPIView):
 
 
 class AddFollowerView(views.APIView):
-    '''Добавление в подписчики'''
     permission_classes = [permissions.IsAuthenticated]
 
 
     def post(self, request, pk):
+        '''Подписаться на пользователя(pk)'''
         try:
             user = User.objects.get(id = pk)
+            if user.id is request.user.id:
+                return Response(status=401, data = {'error': 'Запрещено подписаться на самого себя'})
+            elif not Follower.objects.filter(id = user.id).exists():
+                return Response(status= 401, data= {'error': 'Пользователь уже подписан'})
         except User.DoesNotExist:  #проверить
-            return Response(status=404)
+            return Response(status=404, data = {'error': 'Данный пользователь не найден'})
         Follower.objects.create(subscriber = request.user, user = user)
         return Response(status=201)
     
 
     def delete(self, request, pk):
+        '''удаление из подписчиков'''
         try:
             subj = Follower.objects.get(id = pk)
         except Follower.DoesNotExist:
