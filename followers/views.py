@@ -7,32 +7,6 @@ from .serializers import ListFollowerSerializer
 from TestUser.models import User
 
 
-# class ListFollowerView(generics.ListAPIView):
-#     '''Вывод списка подписчиков пользователей'''
-
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = ListFollowerSerializer
-    
-#     def get_queryset(self):
-#         return Follower.objects.filter(user = self.request.user) #найдем всех его подписчиков
-
-
-
-# class ListFollowerView(generics.ListAPIView):
-#     """ Вывод списка подписчиков пользователя
-#     """
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = ListFollowerSerializer
-
-#     def get_queryset(self):
-#         return Follower.objects.filter(user=self.request.user)
-
-# class FollowerFilter(FilterSet):
-#     class Meta:
-#         model = Follower  # Ваша модель Follower
-#         fields = ['user']  # Поле, по которому будет фильтроваться
-
-
 class ListFollowerView(generics.ListAPIView):
     """ Вывод списка своих подписчиков
     """
@@ -56,17 +30,20 @@ class AddFollowerView(views.APIView):
                 return Response(status=401, data = {'error': 'Запрещено подписаться на самого себя'})
             elif not Follower.objects.filter(id = user.id).exists():
                 return Response(status= 401, data= {'error': 'Пользователь уже подписан'})
-        except User.DoesNotExist:  #проверить
+        except User.DoesNotExist: 
             return Response(status=404, data = {'error': 'Данный пользователь не найден'})
         Follower.objects.create(subscriber = request.user, user = user)
         return Response(status=201)
     
 
+class DeleteFollowerView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def delete(self, request, pk):
         '''удаление из подписчиков'''
         try:
-            subj = Follower.objects.get(id = pk)
+            subj = Follower.objects.get(user_id = pk, subscriber_id = request.user.id)
         except Follower.DoesNotExist:
-            return Response(status=404)
+            return Response(status=404, data = {'error': 'Ошибка в подписке'})
         subj.delete()
         return Response(status=204)

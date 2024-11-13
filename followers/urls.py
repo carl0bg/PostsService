@@ -1,10 +1,11 @@
 from django.urls import path
 
-from .views import ListFollowerView, AddFollowerView
+from .views import ListFollowerView, AddFollowerView, DeleteFollowerView
 
 
 
 urlpatterns = [
-    path('<int:pk>', AddFollowerView.as_view()),
-    path('', ListFollowerView.as_view()),
+    path('sub/<int:pk>', AddFollowerView.as_view()),
+    path('unsub/<int:pk>', DeleteFollowerView.as_view()),
+    path('my_all', ListFollowerView.as_view()),
 ]
