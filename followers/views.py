@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet # Включите FilterSet
 
 from .models import Follower
-from .serializers import ListFollowerSerializer
+from .serializers import ListFollowerOnSerializer, ListFollowerSerializer
 from TestUser.models import User
 
 
@@ -47,3 +47,13 @@ class DeleteFollowerView(views.APIView):
             return Response(status=404, data = {'error': 'Ошибка в подписке'})
         subj.delete()
         return Response(status=204)
+    
+
+class IsFollowerToView(generics.ListAPIView):
+    """ Вывод списка на кого подписан пользователь
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ListFollowerOnSerializer
+
+    def get_queryset(self):
+        return Follower.objects.filter(subscriber=self.request.user)
