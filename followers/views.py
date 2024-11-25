@@ -28,7 +28,7 @@ class AddFollowerView(views.APIView):
             user = User.objects.get(id = pk)
             if user.id is request.user.id:
                 return Response(status=401, data = {'error': 'Запрещено подписаться на самого себя'})
-            elif not Follower.objects.filter(id = user.id).exists():
+            elif Follower.objects.filter(user = user.id, subscriber = request.user.id).exists():
                 return Response(status= 401, data= {'error': 'Пользователь уже подписан'})
         except User.DoesNotExist: 
             return Response(status=404, data = {'error': 'Данный пользователь не найден'})
@@ -40,7 +40,7 @@ class DeleteFollowerView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, pk):
-        '''удаление из подписчиков'''
+        '''Удалиться из подписчиков'''
         try:
             subj = Follower.objects.get(user_id = pk, subscriber_id = request.user.id)
         except Follower.DoesNotExist:
