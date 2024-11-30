@@ -1,13 +1,18 @@
 from posts.models import Posts
-from followers.models import Follower
 
 
 
-def feed(user):
-    # 1
-    news = []
-    subs = Follower.objects.filter(subscriber = user)
-    for sub in subs:
-        news.append(Posts.objects.filter(user = sub.user, created_date__hour = 1).order_by('-created_date'))
+class Feed:
+    '''Service feeds'''
+    def get_post_list(self, user):
+        return Posts.objects.filter(user__owner__subscriber = user)\
+            .order_by('-created_date')\
+            .select_related('user')\
+            .prefetch_related('comments')
+
+    # def get_post_list(self, user):
+    #     return Posts.objects.filter(user__owner__subscriber=user).order_by('-created_date')\
+    #         .select_related('user').prefetch_related('comments')
 
     
+feed_service = Feed()
