@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions, mixins, decorators, viewsets
+from rest_framework import mixins, viewsets
 
 
 class MixedPermission:
@@ -17,11 +17,7 @@ class MixedPermissionGenericViewSet(MixedPermission, viewsets.GenericViewSet):
     pass
 
 
-class CreateUpdateDestroy(mixins.CreateModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.DestroyModelMixin,
-                            MixedPermission,
-                            viewsets.GenericViewSet):
+class CreateUpdateDestroy(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, MixedPermission, viewsets.GenericViewSet):
     pass
 
 
