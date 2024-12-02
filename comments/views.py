@@ -3,22 +3,7 @@ from rest_framework import permissions, generics
 from .base.classes import CreateUpdateDestroy, CreateRetrieveUpdateDestroy
 from .base.permissions import IsAuthor
 from .models import Posts, Comment
-from .serializers import (PostSerializer2, ListPostSerializer, CreateCommentSerializers)
-
-
-class PostListView(generics.ListAPIView):
-    """ Список public постов на стене пользователя
-    """
-    serializer_class = ListPostSerializer
-    permission_classes = [permissions.AllowAny]
-
-    def get_queryset(self):
-        return Posts.objects.filter(
-            user_id=self.kwargs.get('pk'),
-            chat = Posts.ChatType.PRIVATE
-        ).select_related('user').prefetch_related('comments', 'photos', 'documents', 'videos')
-    
-
+from .serializers import (PostSerializer2, CreateCommentSerializers)
 
 
 

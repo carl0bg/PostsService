@@ -42,3 +42,15 @@ class PostSerializer(serializers.ModelSerializer):
             del validated_data['method'] 
             post = orm_patch_post(post.id, validated_data, photos_data, videos_data, documents_data)
             return post
+
+
+class ListPostSerializer(serializers.ModelSerializer):
+    '''Список постов'''
+    user = serializers.ReadOnlyField(source= 'user.username')
+    photos = PhotoSerializers(many=True, read_only=True)
+    documents = DocumentSerializers(many = True, read_only = True)
+    videos = VideoSerializers(many = True, read_only = True)
+
+    class Meta:
+        model = Posts
+        fields = ("id", "created_date", "user", "text", "photos", 'documents', 'videos', "comments_count")

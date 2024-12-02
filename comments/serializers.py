@@ -44,16 +44,3 @@ class PostSerializer2(serializers.ModelSerializer):
         model = Posts
         # fields = ("id", "created_date", "user", "text", "comments", "view_count")
         fields = "__all__"
-
-
-
-class ListPostSerializer(serializers.ModelSerializer):
-    '''Список постов'''
-    user = serializers.ReadOnlyField(source= 'user.username')
-    photos = PhotoSerializers(many=True, read_only=True)
-    documents = DocumentSerializers(many = True, read_only = True)
-    videos = VideoSerializers(many = True, read_only = True)
-
-    class Meta:
-        model = Posts
-        fields = ("id", "created_date", "user", "text", "photos", 'documents', 'videos', "comments_count")

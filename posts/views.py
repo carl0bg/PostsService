@@ -8,9 +8,12 @@ from rest_framework import generics, mixins
 
 from drf_yasg.utils import swagger_auto_schema
 
+from comments.base.classes import MixedPermission
+from followers.database import FriendshipChecker
+
 
 from .models import Posts
-from .serializers import PostSerializer
+from .serializers import ListPostSerializer, PostSerializer
 from .permissions import IsOnlyOwner, IsOwnerOrReadOnly
 
 
@@ -48,18 +51,18 @@ class SubViewPkMixin:
 
 
 
-class PostListAPIView(generics.ListAPIView):
-    '''Получить весь список Post'''
-    queryset = Posts.objects.all()
-    serializer_class = PostSerializer
+# class PostListAPIView(generics.ListAPIView):
+#     '''Получить весь список Post'''
+#     queryset = Posts.objects.all()
+#     serializer_class = PostSerializer
     
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .select_related('user')  # Пример для ForeignKey к пользователю
-            .prefetch_related('documents', 'photos', 'videos')
-        )
+#     def get_queryset(self):
+#         return (
+#             super()
+#             .get_queryset()
+#             .select_related('user')  # Пример для ForeignKey к пользователю
+#             .prefetch_related('documents', 'photos', 'videos')
+#         )
 
 
 
@@ -68,12 +71,13 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsOwnerOrReadOnly]
-
+    
     @swagger_auto_schema(
         operation_description="Put Post",
         request_body=PostSerializer,
     )
     def put(self, request, pk):
+        '''PUT отдельного элемента Post'''
         if (post:=self.get_object()) is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -88,6 +92,7 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
         request_body=PostSerializer,
     )
     def patch(self, request, pk):
+        '''PATCH отдельного элемента Post'''
         if (post:=self.get_object()) is None:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -96,8 +101,15 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    def get(self, request, *args, **kwargs):
+        user_id = Posts.objects.get(id = kwargs.get('pk')).user.id
+        if FriendshipChecker.are_friends(self.request.user.id, user_id):
+            return self.retrieve(request, *args, **kwargs)
+        else:
+            return Response(data = {'detail': 'Данный post private type'}, status=status.HTTP_403_FORBIDDEN)
 
-
+    
 
 
 class PostCreateAPIView(generics.CreateAPIView, SubViewPkMixin):
@@ -124,3 +136,38 @@ class PostDeleteView(generics.DestroyAPIView):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsOnlyOwner]
+
+
+class PostListViewPublic(generics.ListAPIView):
+    """ Список public постов на стене пользователя
+    """
+    serializer_class = ListPostSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Posts.objects.filter(
+            user_id=self.kwargs.get('pk'),
+            chat = Posts.ChatType.PUBLIC
+        ).order_by('-created_date')\
+        .select_related('user').prefetch_related('comments', 'photos', 'documents', 'videos')
+    
+
+class PostListViewPrivate(generics.ListAPIView):
+    """ Список private постов на стене пользователя
+    """
+    serializer_class = ListPostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Posts.objects.filter(
+            user_id=self.kwargs.get('pk'),
+            chat = Posts.ChatType.PRIVATE
+        ).order_by('-created_date')\
+        .select_related('user').prefetch_related('comments', 'photos', 'documents', 'videos')
+        
+
+    def get(self, request, *args, **kwargs):
+        if FriendshipChecker.are_friends(self.request.user.id, self.kwargs.get('pk')):
+            return self.list(request, *args, **kwargs)
+        else:
+            return Response(data = {"error": "Ошибка в подписке"}, status=status.HTTP_403_FORBIDDEN)

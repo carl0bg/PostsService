@@ -86,3 +86,5 @@ def orm_patch_post(post_id: int, validate_data: dict, photos, videos, documents)
     post.save()
 
     return post
+
+

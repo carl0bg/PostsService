@@ -2,7 +2,8 @@ from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 
 from comments.base.classes import MixedPermission
-from comments.serializers import ListPostSerializer, PostSerializer2
+from comments.serializers import PostSerializer2
+from posts.serializers import ListPostSerializer
 from .services import feed_service
 
 
