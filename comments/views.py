@@ -7,13 +7,19 @@ from .serializers import (PostSerializer2, ListPostSerializer, CreateCommentSeri
 
 
 class PostListView(generics.ListAPIView):
-    """ Список постов на стене пользователя
+    """ Список public постов на стене пользователя
     """
     serializer_class = ListPostSerializer
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         return Posts.objects.filter(
-            user_id=self.kwargs.get('pk')).select_related('user').prefetch_related('comments')
+            user_id=self.kwargs.get('pk'),
+            chat = Posts.ChatType.PRIVATE
+        ).select_related('user').prefetch_related('comments', 'photos', 'documents', 'videos')
+    
+
+
 
 
 class PostView(CreateRetrieveUpdateDestroy):

@@ -4,6 +4,9 @@ from .recursiv_serializers import *
 from .models import Comment
 
 from posts.models import Posts
+from photo.serializers import PhotoSerializers
+from video.serializers import VideoSerializers
+from document.serializers import DocumentSerializers
 
 
 class CreateCommentSerializers(serializers.ModelSerializer):
@@ -47,9 +50,10 @@ class PostSerializer2(serializers.ModelSerializer):
 class ListPostSerializer(serializers.ModelSerializer):
     '''Список постов'''
     user = serializers.ReadOnlyField(source= 'user.username')
+    photos = PhotoSerializers(many=True, read_only=True)
+    documents = DocumentSerializers(many = True, read_only = True)
+    videos = VideoSerializers(many = True, read_only = True)
 
     class Meta:
         model = Posts
-        # fields = "__all__"
-
-        fields = ("id", "created_date", "user", "text", "comments_count")
+        fields = ("id", "created_date", "user", "text", "photos", 'documents', 'videos', "comments_count")

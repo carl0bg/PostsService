@@ -14,7 +14,7 @@ class ListFollowerView(generics.ListAPIView):
     serializer_class = ListFollowerSerializer
 
     def get_queryset(self):
-        return Follower.objects.filter(user=self.request.user)
+        return Follower.objects.filter(user=self.request.user).select_related('user', 'subscriber')
 
 
 
@@ -46,7 +46,7 @@ class DeleteFollowerView(views.APIView):
         except Follower.DoesNotExist:
             return Response(status=404, data = {'error': 'Ошибка в подписке'})
         subj.delete()
-        return Response(status=204)
+        return Response(status=204, data = {'message': "Успешно отписался"})
     
 
 class IsFollowerToView(generics.ListAPIView):
@@ -56,4 +56,4 @@ class IsFollowerToView(generics.ListAPIView):
     serializer_class = ListFollowerOnSerializer
 
     def get_queryset(self):
-        return Follower.objects.filter(subscriber=self.request.user)
+        return Follower.objects.filter(subscriber=self.request.user).select_related('user', 'subscriber')
