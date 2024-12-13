@@ -16,7 +16,7 @@ from .models import Posts
 from .serializers import ListPostSerializer, PostSerializer
 from .permissions import IsOnlyOwner, IsOwnerOrReadOnly
 
-
+from drf_yasg.utils import swagger_auto_schema
 
 
 
@@ -71,10 +71,11 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsOwnerOrReadOnly]
-    
+
     @swagger_auto_schema(
         operation_description="Put Post",
         request_body=PostSerializer,
+        tags=['Posts']
     )
     def put(self, request, pk):
         '''PUT отдельного элемента Post'''
@@ -90,6 +91,7 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     @swagger_auto_schema(
         operation_description="Patch Post",
         request_body=PostSerializer,
+        tags=['Posts']
     )
     def patch(self, request, pk):
         '''PATCH отдельного элемента Post'''
@@ -103,7 +105,9 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     
     
     def get(self, request, *args, **kwargs):
-        user_id = Posts.objects.get(id = kwargs.get('pk')).user.id
+        '''GET отдельного элемента Post'''
+        ### TODO надо ппереопределить self.get_objects
+        user_id = Posts.objects.select_related('user').get(id = kwargs.get('pk')).user.id
         if FriendshipChecker.are_friends(self.request.user.id, user_id):
             return self.retrieve(request, *args, **kwargs)
         else:
@@ -121,6 +125,7 @@ class PostCreateAPIView(generics.CreateAPIView, SubViewPkMixin):
     @swagger_auto_schema(
         operation_description="Создание поста",
         request_body=PostSerializer,
+        tags=['Posts'],
         responses={201: PostSerializer(many=False)}
     )
     def post(self, request):

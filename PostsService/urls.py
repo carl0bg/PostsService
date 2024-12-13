@@ -9,7 +9,7 @@ urlpatterns = [
     path('auth/', include('TestUser.urls', namespace='users_api')),
     path('token/', include('JWT.urls', namespace='token_api')),
 
-    path('wall/', include('comments.urls')),
+    path('comments/', include('comments.urls')),
     path('v2/wall/', include('wall.urls')),
     path('followers/', include('followers.urls')),
 ]
