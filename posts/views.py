@@ -75,7 +75,6 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     @swagger_auto_schema(
         operation_description="Put Post",
         request_body=PostSerializer,
-        tags=['Posts']
     )
     def put(self, request, pk):
         '''PUT отдельного элемента Post'''
@@ -91,7 +90,6 @@ class PostGetOneAPIView(generics.RetrieveUpdateAPIView, SubViewPkMixin):
     @swagger_auto_schema(
         operation_description="Patch Post",
         request_body=PostSerializer,
-        tags=['Posts']
     )
     def patch(self, request, pk):
         '''PATCH отдельного элемента Post'''
@@ -125,7 +123,6 @@ class PostCreateAPIView(generics.CreateAPIView, SubViewPkMixin):
     @swagger_auto_schema(
         operation_description="Создание поста",
         request_body=PostSerializer,
-        tags=['Posts'],
         responses={201: PostSerializer(many=False)}
     )
     def post(self, request):

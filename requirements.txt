@@ -7,6 +7,7 @@ botocore==1.35.2
 certifi==2024.7.4
 cffi==1.17.0
 Django==5.1
+django-cors-headers==4.6.0
 django-filter==24.3
 django-js-asset==2.2.0
 django-mptt==0.16.0

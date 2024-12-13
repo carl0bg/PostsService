@@ -32,6 +32,7 @@ DJANGO_BASE_APPS = [
 
     'drf_yasg',
     'rest_framework',
+    'corsheaders',
     'django_filters',
     'mptt'
 ]
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # 'django.contrib.sessions.middleware.SessionMiddleware',  #управляет сеансами по запросам.
     # 'PostsService.middleware.JWTAuthenticationMiddleware', #my middleware for token
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     # 'django.contrib.auth.middleware.AuthenticationMiddleware',  #связывает пользователей с запросами с помощью сеансов. 
@@ -243,3 +245,6 @@ LOGGING = {
         },
     },
 }
+
+
+CORS_ALLOW_ALL_ORIGINS = True #TODO
